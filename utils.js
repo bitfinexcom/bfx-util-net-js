@@ -1,6 +1,5 @@
 const fs = require('fs')
 const _ = require('lodash')
-const crypto = require('crypto')
 
 var get_conf_json = (env, type, path) => {
   const conf = JSON.parse(fs.readFileSync(path, 'utf8'));
@@ -18,10 +17,6 @@ var get_conf_json = (env, type, path) => {
   return res
 }
 
-function ring_id(val, dim) {
-  return val && dim ? val % dim : 0
-}
-
 function elapsed(t) {
   var precision = 3
   var elapsed = process.hrtime(t)[1] / 1000000; // divide by a million to get nano to milli
@@ -29,7 +24,6 @@ function elapsed(t) {
 }
 
 module.exports = {
-  ring_id : ring_id,
   get_conf_json: get_conf_json,
   elapsed: elapsed
 }
