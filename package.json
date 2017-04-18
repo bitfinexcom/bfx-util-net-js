@@ -1,0 +1,50 @@
+{
+  "name": "bfx-svc-js",
+  "version": "0.0.1",
+  "private": false,
+  "description": "Bitfinex Service",
+  "author": {
+    "name": "prdn",
+    "email": "paolo@bitfinex.com"
+  },
+  "keywords": [
+    "bitfinex"
+  ],
+  "dependencies": {
+    "grenache-nodejs-base": "0.0.11",
+    "grenache-nodejs-http": "0.0.9",
+    "grenache-nodejs-ws": "0.0.9",
+    "lodash": "~4.17.4",
+    "yargs": "^6.3.0"
+  },
+  "engine": {
+    "node": ">=6.0"
+  },
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "devDependencies": {
+    "chai": "~3.2.0",
+    "mocha": "~2.2.5"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitfinexcom/bfx-svc-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bitfinexcom/bfx-svc-js/issues"
+  },
+  "homepage": "https://github.com/bitfinexcom/bfx-svc-js",
+  "maintainers": [
+    {
+      "name": "prdn",
+      "email": "paolo@bitfinex.com"
+    }
+  ]
+}

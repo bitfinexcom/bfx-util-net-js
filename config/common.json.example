@@ -1,0 +1,9 @@
+{
+  "wscore_ipfx": "bfx120",
+  "wscore_esrc": "BFX2MWPUB",
+  "dir_log": "logs",
+  "debug": 0,
+  "shards": {
+    "priv": 5
+  }
+}

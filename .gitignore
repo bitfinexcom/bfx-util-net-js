@@ -1,0 +1,6 @@
+*.swo
+*.swp
+node_modules
+!config/*.json.example
+config/*.json
+logs
