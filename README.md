@@ -1,22 +1,11 @@
-#bfxwswrk
+#bfx-svc-js
 
-git clone git@github.com:bitfinexcom/bfxwswrk.git REPO
-
-git remote -v
-
-git remote rename origin upstream
-
-Create new repo on github
-
-git remote add origin git@github.com:bitfinexcom/REPO.git
+git clone git@github.com:bitfinexcom/REPO.git REPO
 
 git remote -v
 
-vim .git/config and make sure that has the following configuration for master
-```
-[branch "master"]
-remote = origin
-merge = refs/heads/master
-```
+git remote add upstream git@github.com:bitfinexcom/PARENT.git
 
-git push -u origin master
+git remote -v
+
+git push origin master
