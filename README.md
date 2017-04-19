@@ -13,9 +13,10 @@ git remote add origin git@github.com:bitfinexcom/REPO.git
 git remote -v
 
 vim .git/config and make sure that has the following configuration for master
+```
 [branch "master"]
 remote = origin
 merge = refs/heads/master
-
+```
 
 git push -u origin master
