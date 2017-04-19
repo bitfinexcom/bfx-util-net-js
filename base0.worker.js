@@ -1,6 +1,7 @@
 'use strict'
 
 const os = require('os')
+const fs = require('fs')
 const _ = require('lodash')
 const async = require('async')
 const util = require('util')
@@ -13,6 +14,8 @@ class WorkerBase0 {
     this.ctx = ctx
     this.wtype = ctx.wtype
     this.prefix = this.wtype
+    
+    this.status = {}
 
     this.conf.init = {
       facilities: []
@@ -74,6 +77,20 @@ class WorkerBase0 {
     })
  
     async.series(aseries, cb)
+  }
+
+  loadStatus() {
+    try {
+      _.extend(this.status, JSON.parse(fs.readFileSync(
+        `${__dirname}/status/${this.prefix}.json`, 'UTF-8')
+      ))
+    } catch(e) {}
+  }
+
+  saveStatus() {
+    try {
+      fs.writeFile(`${__dirname}/status/${this.prefix}.json`, JSON.stringify(this.status), () => {})
+    } catch(e) {}
   }
 
   start(cb) {

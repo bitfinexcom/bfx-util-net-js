@@ -3,7 +3,7 @@
 const _ = require('lodash')
 const GrBase = require('grenache-nodejs-base')
 const GrWs = require('grenache-nodejs-ws')
-const GrHttp = require('grenache-nodejs-ws')
+const GrHttp = require('grenache-nodejs-http')
 const Facility = require('./base')
 
 class GrcFacility extends Facility {
@@ -17,7 +17,7 @@ class GrcFacility extends Facility {
   }
 
   onRequest(rid, type, payload, handler) {
-    this.emit('request', type, payload, handler)
+    this.emit('request', rid, type, payload, handler)
   }
 
   start(cb) {
@@ -29,7 +29,7 @@ class GrcFacility extends Facility {
 
     this.peer = null
 
-    switch (this.opts.transport) {
+    switch (this.conf.transport) {
       case 'ws':
         this.peer = new GrWs.Peer(this.link, {})
         break
@@ -38,20 +38,16 @@ class GrcFacility extends Facility {
         break
     }
 
-    switch (this.opts.type) {
-      case 'worker':
-        this.service = this.peer.listen('req', this.opts.port)
-        this.peer.on('request', this.onRequest.bind(this))
+    if (this.opts.service) {
+      this.service = this.peer.listen('req', this.opts.svc_port || 0)
+      this.peer.on('request', this.onRequest.bind(this))
 
-        this._announceItv = setInterval(() => {
-          _.each(this.opts.services, srv => {
-            const port = this.service.port
-            this.peer.announce(srv, port, {}, () => {
-              //console.log('announced', srv, port)
-            })
-          })
-        }, 1000)
-        break
+      this._announceItv = setInterval(() => {
+        const port = this.service.port
+        this.peer.announce(`bfx:${this.opts.service}`, port, {}, () => {
+          //console.log('announced', this.opts.service, port)
+        })
+      }, 2000)
     }
 
     cb()
