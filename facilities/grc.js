@@ -38,25 +38,60 @@ class GrcFacility extends Facility {
         break
     }
 
-    if (this.opts.service) {
-      this.service = this.peer.listen('req', this.opts.svc_port || 0)
-      this.peer.on('request', this.onRequest.bind(this))
-
-      this._announceItv = setInterval(() => {
-        const port = this.service.port
-        this.peer.announce(`bfx:${this.opts.service}`, port, {}, () => {
-          //console.log('announced', this.opts.service, port)
-        })
-      }, 2000)
-    }
+    this._tickItv = setInterval(() => {
+      this.tick()
+    }, 2000)
 
     cb()
   }
 
+  tick() {
+    if (this.service && !_.isArray(this.opts.services)) {
+      this.peer.unlisten(req, this.service.port)
+      this.peer.removeListener('request', this.onRequest.bind(this))
+      return
+    }
+   
+    if (!_.isArray(this.opts.services) || !this.opts.svc_port) return
+    
+    const port = this.opts.svc_port
+
+    if (!this.service) {
+      this.service = this.peer.listen('req', port || 0)
+      this.peer.on('request', this.onRequest.bind(this))
+    }
+
+    _.each(this.opts.services, srv => {
+      srv = `bfx:${srv}`
+      this.peer.announce(srv, port, {}, () => {
+        console.log('grc:announce', srv, port)
+      })
+    })
+  }
+    
   stop(cb) {
     clearInterval(this._announceItv)
-    this.peer.removeListener('request', this.onRequest.bind(this))
+    if (this.service) {
+      this.peer.unlisten('req', this.service.port)
+      this.peer.removeListener('request', this.onRequest.bind(this))
+    }
     cb()
+  }
+
+  addService(s) {
+    if (!_.isArray(this.opts.services)) {
+      this.opts.servies = []
+    }
+
+    this.opts.services = _.union(this.opts.services, [s])
+  }
+
+  delService(s) {
+     if (!_.isArray(this.opts.services)) {
+      this.opts.servies = []
+    }
+
+    this.opts.services = _.difference(this.opts.services, [s])
   }
 }
 

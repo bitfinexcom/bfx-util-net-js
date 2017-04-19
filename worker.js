@@ -2,7 +2,6 @@
 
 const fs = require('fs')
 const _ = require('lodash')
-const moment = require('moment')
 const lutils = require('./utils.js')
 
 process.env.TZ = 'UTC'
