@@ -99,6 +99,18 @@ class GrcFacility extends Facility {
 
     this.opts.services = _.difference(this.opts.services, [s])
   }
+
+  req(service, action, args, cb) {
+    this.peer.request(service, {
+      action: action,
+      args: args 
+    }, {}, (err, res) => {
+      if (err) return cb(err)
+      err = res[0]
+      res = res[1]
+      cb(err, res)
+    })
+  }
 }
 
 module.exports = GrcFacility 

@@ -140,6 +140,7 @@ class Base0 {
 
     async.series(aseries, cb)
   }
+
 }
 
 module.exports = Base0
