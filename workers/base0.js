@@ -5,7 +5,7 @@ const fs = require('fs')
 const _ = require('lodash')
 const async = require('async')
 const util = require('util')
-const lutils = require('./utils.js')
+const lutils = require('./../utils.js')
 
 class Base0 {
 
@@ -38,7 +38,7 @@ class Base0 {
     }
     
     try {
-      fmod = require(__dirname + '/' + rdir + '/' + name + '.js')
+      fmod = require(`${__dirname}/../${rdir}/${name}.js`)
     } catch(e) {
       console.log(e)
     }
@@ -77,6 +77,10 @@ class Base0 {
     })
  
     async.series(aseries, cb)
+  }
+
+  getApi(name) {
+    return require(`${__dirname}/api/${name}`)
   }
 
   loadStatus() {

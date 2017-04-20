@@ -17,7 +17,14 @@ class GrcFacility extends Facility {
   }
 
   onRequest(rid, type, payload, handler) {
-    this.emit('request', rid, type, payload, handler)
+    if (this.api) {
+      const api = this.api
+      api.handle(payload, (err, res) => {
+        handler.reply([err, res])
+      }) 
+    } else {
+      this.emit('request', rid, type, payload, handler)
+    }
   }
 
   start(cb) {
@@ -62,13 +69,12 @@ class GrcFacility extends Facility {
     }
 
     _.each(this.opts.services, srv => {
-      srv = `bfx:${srv}`
       this.peer.announce(srv, port, {}, () => {
-        console.log('grc:announce', srv, port)
+        //console.log('grc:announce', srv, port)
       })
     })
   }
-    
+
   stop(cb) {
     clearInterval(this._announceItv)
     if (this.service) {

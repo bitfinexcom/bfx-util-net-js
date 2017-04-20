@@ -23,6 +23,10 @@ class Facility extends EventEmitter {
     this.conf = conf[this.opts.ns]
   }
 
+  set(k, v) {
+    this[k] = v
+  }
+
   start(cb) {
     this.active = 1
     cb()
