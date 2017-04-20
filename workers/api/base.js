@@ -9,16 +9,14 @@ class Api {
     this.opts = opts
   }
 
-  ctx(msg) {
-    const channel = msg.channel || 'unk'
-
+  ctx(service, msg) {
     return {
-      channel: channel,
-      chp: channel.split(':')
+      service: service,
+      svp: service.split(':')
     }
   }
 
-  handle(msg, cb) {
+  handle(service, msg, cb) {
     const action = msg.action
 
     if (!action || !this[action]) {
@@ -26,7 +24,7 @@ class Api {
     }
 
     let args = _.isArray(msg.args) ? msg.args : []
-    args.unshift(this.ctx(msg))
+    args.unshift(this.ctx(service, msg))
     args = args.concat(cb)
 
     try {
@@ -35,13 +33,6 @@ class Api {
       console.error(e)
       cb('ERR_ACTION')
     }
-  }
-
-  bfxRequest(service, action, args, cb) {
-    this.cal.grc_bfx.peer.request(service, {
-      action: action,
-      args: args
-    }, {}, cb)
   }
 }
 

@@ -16,14 +16,14 @@ class GrcFacility extends Facility {
     this.init()
   }
 
-  onRequest(rid, type, payload, handler) {
+  onRequest(rid, service, payload, handler) {
     if (this.api) {
       const api = this.api
-      api.handle(payload, (err, res) => {
+      api.handle(service, payload, (err, res) => {
         handler.reply([err, res])
       }) 
     } else {
-      this.emit('request', rid, type, payload, handler)
+      this.emit('request', rid, service, payload, handler)
     }
   }
 
