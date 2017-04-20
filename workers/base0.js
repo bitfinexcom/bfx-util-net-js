@@ -7,7 +7,7 @@ const async = require('async')
 const util = require('util')
 const lutils = require('./utils.js')
 
-class WorkerBase0 {
+class Base0 {
 
   constructor(conf, ctx) {
     this.conf = conf
@@ -138,4 +138,4 @@ class WorkerBase0 {
   }
 }
 
-module.exports = WorkerBase0
+module.exports = Base0
