@@ -11,9 +11,9 @@
     "bitfinex"
   ],
   "dependencies": {
-    "grenache-nodejs-base": "0.0.14",
-    "grenache-nodejs-http": "0.0.14",
-    "grenache-nodejs-ws": "0.0.14",
+    "grenache-nodejs-base": "0.0.16",
+    "grenache-nodejs-http": "0.0.16",
+    "grenache-nodejs-ws": "0.0.16",
     "lodash": "~4.17.4",
     "yargs": "^6.3.0"
   },

@@ -98,6 +98,8 @@ class Base0 {
   }
 
   start(cb) {
+    this._intervals = {}
+    
     const aseries = []
     
     aseries.push(next => {
@@ -119,6 +121,8 @@ class Base0 {
   }
 
   stop(cb) {
+    _.each(this._intervals, i => clearInterval(i))
+
     const aseries = []
 
     if (this._stop) {

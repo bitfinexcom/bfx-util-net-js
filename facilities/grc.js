@@ -38,10 +38,10 @@ class GrcFacility extends Facility {
 
     switch (this.conf.transport) {
       case 'ws':
-        this.peer = new GrWs.Peer(this.link, {})
+        this.peer = new GrWs.PeerRPC(this.link, {})
         break
       case 'http':
-        this.peer = new GrHttp.Peer(this.link, {})
+        this.peer = new GrHttp.PeerRPC(this.link, {})
         break
     }
 
@@ -54,8 +54,8 @@ class GrcFacility extends Facility {
 
   tick() {
     if (this.service && !_.isArray(this.opts.services)) {
-      this.peer.unlisten(req, this.service.port)
-      this.peer.removeListener('request', this.onRequest.bind(this))
+      this.service.stop()
+      this.service.removeListener('request', this.onRequest.bind(this))
       return
     }
    
@@ -64,12 +64,13 @@ class GrcFacility extends Facility {
     const port = this.opts.svc_port
 
     if (!this.service) {
-      this.service = this.peer.listen('req', port || 0)
-      this.peer.on('request', this.onRequest.bind(this))
+      this.service = this.peer.transport('server')
+      this.service.listen(port || 0)
+      this.service.on('request', this.onRequest.bind(this))
     }
 
     _.each(this.opts.services, srv => {
-      this.peer.announce(srv, port, {}, () => {
+      this.link.announce(srv, port, {}, () => {
         //console.log('grc:announce', srv, port)
       })
     })
@@ -78,26 +79,30 @@ class GrcFacility extends Facility {
   stop(cb) {
     clearInterval(this._announceItv)
     if (this.service) {
-      this.peer.unlisten('req', this.service.port)
-      this.peer.removeListener('request', this.onRequest.bind(this))
+      this.service.stop()
+      this.service.removeListener('request', this.onRequest.bind(this))
     }
     cb()
   }
 
-  addService(s) {
-    if (!_.isArray(this.opts.services)) {
-      this.opts.servies = []
-    }
-
-    this.opts.services = _.union(this.opts.services, [s])
+  setServices(ss) {
+    this.opts.services = ss
   }
 
-  delService(s) {
+  addServices(ss) {
+    if (!_.isArray(this.opts.services)) {
+      this.opts.services = []
+    }
+
+    this.opts.services = _.union(this.opts.services, ss)
+  }
+
+  delServices(ss) {
      if (!_.isArray(this.opts.services)) {
       this.opts.servies = []
     }
 
-    this.opts.services = _.difference(this.opts.services, [s])
+    this.opts.services = _.difference(this.opts.services, ss)
   }
 
   req(service, action, args, cb) {
