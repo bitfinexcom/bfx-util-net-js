@@ -18,15 +18,26 @@ class Base0 {
     this.status = {}
 
     this.conf.init = {
-      facilities: []
+      facilities: [
+        ['fac', 'intervals', '0', '0', {}]
+      ]
     }
 
     this.mem = {}
   }
 
+  init() {}
+
+  loadConf(c, n = null) {
+    _.merge(
+      this.conf,
+      lutils.get_conf_json(this.ctx.env, n, `${__dirname}/../config/${c}.json`)
+    )
+  }
+
   facility(type, name, ns, opts) {
-    var fmod = null
-    var rdir = null
+    let fmod = null
+    let rdir = null
 
     switch (type) {
       case 'plg':
@@ -51,15 +62,17 @@ class Base0 {
   }
 
   fac_add(type, name, ns, label, opts, cb) {
-    var fns = name + '_' + label
-    var fac = this.facility(type, name, ns, opts)
+    const fns = `${name}_${label}`
+    opts.label = label
+
+    const fac = this.facility(type, name, ns, opts)
     this[fns] = fac
     fac.start(cb)
   }
 
   fac_del(name, label, cb) {
-    var fns = name + '_' + label
-    var fac = this[fns]
+    const fns = name + '_' + label
+    const fac = this[fns]
     
     if (!fac) return cb()
     
@@ -68,7 +81,7 @@ class Base0 {
   }
 
   facs(dir, list, cb) {
-    var aseries = []
+    const aseries = []
 
     _.each(list, p => {
       aseries.push(next => {
@@ -77,10 +90,6 @@ class Base0 {
     })
  
     async.series(aseries, cb)
-  }
-
-  getApi(name) {
-    return require(`${__dirname}/api/${name}`)
   }
 
   loadStatus() {
@@ -98,19 +107,16 @@ class Base0 {
   }
 
   start(cb) {
-    this._intervals = {}
-    
     const aseries = []
     
     aseries.push(next => {
       this.facs('fac_add', this.conf.init.facilities, next)
     })
 
-    if (this._start) {
-      aseries.push(next => {
-        this._start(next) 
-      })
-    }
+    aseries.push(next => {
+      if (this._start) this._start(next)
+      else next()
+    })
 
     aseries.push(next => {
       this.active = 1
@@ -121,15 +127,12 @@ class Base0 {
   }
 
   stop(cb) {
-    _.each(this._intervals, i => clearInterval(i))
-
     const aseries = []
 
-    if (this._stop) {
-      aseries.push(next => {
-        this._stop(next) 
-      })
-    }
+    aseries.push(next => {
+      if (this._stop) this._stop(next) 
+      else next()
+    })
 
     aseries.push(next => {
       this.facs('fac_del', _.map(this.conf.init.facilities, f => {
@@ -145,6 +148,9 @@ class Base0 {
     async.series(aseries, cb)
   }
 
+  getPluginCtx() {
+    return {}
+  }
 }
 
 module.exports = Base0

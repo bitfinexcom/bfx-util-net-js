@@ -1,7 +1,7 @@
 const fs = require('fs')
 const _ = require('lodash')
 
-var get_conf_json = (env, type, path) => {
+const get_conf_json = (env, type, path) => {
   const conf = JSON.parse(fs.readFileSync(path, 'utf8'));
   if (!_.isObject(conf)) {
     return {}
@@ -10,10 +10,11 @@ var get_conf_json = (env, type, path) => {
   let res = {}
 
   if (type) {
-    res[type] = conf[env] ? conf[env] : conf
+    _.set(res, type, conf[env] ? conf[env] : conf)
   } else {
     res = conf
   }
+
   return res
 }
 

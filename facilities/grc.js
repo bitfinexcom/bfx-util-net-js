@@ -27,7 +27,7 @@ class GrcFacility extends Facility {
     }
   }
 
-  start(cb) {
+  _start(cb) {
     this.link = new GrBase.Link({
       grape: this.conf.grape
     })
@@ -47,19 +47,20 @@ class GrcFacility extends Facility {
 
     this._tickItv = setInterval(() => {
       this.tick()
-    }, 2000)
+    }, 2500)
 
     cb()
   }
 
   tick() {
-    if (this.service && !_.isArray(this.opts.services)) {
+    const services_pub = _.isArray(this.opts.services) && this.opts.services.length ? this.opts.services : null
+    if (this.service && !services_pub) {
       this.service.stop()
       this.service.removeListener('request', this.onRequest.bind(this))
       return
     }
    
-    if (!_.isArray(this.opts.services) || !this.opts.svc_port) return
+    if (!services_pub || !this.opts.svc_port) return
     
     const port = this.opts.svc_port
 
@@ -69,19 +70,21 @@ class GrcFacility extends Facility {
       this.service.on('request', this.onRequest.bind(this))
     }
 
-    _.each(this.opts.services, srv => {
+    _.each(services_pub, srv => {
       this.link.announce(srv, port, {}, () => {
         //console.log('grc:announce', srv, port)
       })
     })
   }
 
-  stop(cb) {
+  _stop(cb) {
     clearInterval(this._announceItv)
+
     if (this.service) {
       this.service.stop()
       this.service.removeListener('request', this.onRequest.bind(this))
     }
+
     cb()
   }
 
