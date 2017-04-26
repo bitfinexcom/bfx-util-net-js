@@ -1,6 +1,7 @@
 'use strict'
 
 const _ = require('lodash')
+const async = require('async')
 const GrBase = require('grenache-nodejs-base')
 const GrWs = require('grenache-nodejs-ws')
 const GrHttp = require('grenache-nodejs-http')
@@ -12,6 +13,7 @@ class GrcFacility extends Facility {
     super(caller, opts, ctx)
     
     this.name = 'grc'
+    this._hasConf = true
 
     this.init()
   }
@@ -28,28 +30,33 @@ class GrcFacility extends Facility {
   }
 
   _start(cb) {
-    this.link = new GrBase.Link({
-      grape: this.conf.grape
-    })
+    async.series([
+      next => { super._start(next) },
+      next => {
+        this.link = new GrBase.Link({
+          grape: this.conf.grape
+        })
 
-    this.link.start()
+        this.link.start()
 
-    this.peer = null
+        this.peer = null
 
-    switch (this.conf.transport) {
-      case 'ws':
-        this.peer = new GrWs.PeerRPC(this.link, {})
-        break
-      case 'http':
-        this.peer = new GrHttp.PeerRPC(this.link, {})
-        break
-    }
+        switch (this.conf.transport) {
+          case 'ws':
+            this.peer = new GrWs.PeerRPC(this.link, {})
+            break
+          case 'http':
+            this.peer = new GrHttp.PeerRPC(this.link, {})
+            break
+        }
 
-    this._tickItv = setInterval(() => {
-      this.tick()
-    }, 2500)
+        this._tickItv = setInterval(() => {
+          this.tick()
+        }, 2500)
 
-    cb()
+        next()
+      }
+    ], cb)
   }
 
   tick() {
@@ -78,14 +85,19 @@ class GrcFacility extends Facility {
   }
 
   _stop(cb) {
-    clearInterval(this._announceItv)
+    async.series([
+      next => { super._stop(next) },
+      next => {
+        clearInterval(this._announceItv)
 
-    if (this.service) {
-      this.service.stop()
-      this.service.removeListener('request', this.onRequest.bind(this))
-    }
+        if (this.service) {
+          this.service.stop()
+          this.service.removeListener('request', this.onRequest.bind(this))
+        }
 
-    cb()
+        next()
+      }
+    ], cb)
   }
 
   setServices(ss) {
@@ -109,6 +121,10 @@ class GrcFacility extends Facility {
   }
 
   req(service, action, args, cb) {
+    if (!_.isString(action)) throw new Error('ERR_GRC_REQ_ACTION_INVALID')
+    if (!_.isArray(args)) throw new Error('ERR_GRC_REQ_ARGS_INVALID')
+    if (!_.isFunction(cb)) throw new Error('ERR_GRC_REQ_CB_INVALID')
+
     this.peer.request(service, {
       action: action,
       args: args 

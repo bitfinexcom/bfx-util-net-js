@@ -13,8 +13,10 @@ class Base0 {
     this.conf = conf
     this.ctx = ctx
     this.wtype = ctx.wtype
-    this.prefix = this.wtype
-    
+    this.prefix = this.wtype    
+  }
+
+  init() {
     this.status = {}
 
     this.conf.init = {
@@ -24,9 +26,9 @@ class Base0 {
     }
 
     this.mem = {}
-  }
 
-  init() {}
+    this.loadStatus()
+  }
 
   loadConf(c, n = null) {
     _.merge(
@@ -71,7 +73,7 @@ class Base0 {
   }
 
   fac_del(name, label, cb) {
-    const fns = name + '_' + label
+    const fns = `${name}_${label}`
     const fac = this[fns]
     
     if (!fac) return cb()
@@ -95,15 +97,17 @@ class Base0 {
   loadStatus() {
     try {
       _.extend(this.status, JSON.parse(fs.readFileSync(
-        `${__dirname}/status/${this.prefix}.json`, 'UTF-8')
+        `${__dirname}/../status/${this.prefix}.json`, 'UTF-8')
       ))
     } catch(e) {}
   }
 
   saveStatus() {
     try {
-      fs.writeFile(`${__dirname}/status/${this.prefix}.json`, JSON.stringify(this.status), () => {})
-    } catch(e) {}
+      fs.writeFile(`${__dirname}/../status/${this.prefix}.json`, JSON.stringify(this.status), () => {})
+    } catch(e) {
+      console.error(e)
+    }
   }
 
   start(cb) {
@@ -114,8 +118,7 @@ class Base0 {
     })
 
     aseries.push(next => {
-      if (this._start) this._start(next)
-      else next()
+      this._start0(next)
     })
 
     aseries.push(next => {
@@ -123,15 +126,21 @@ class Base0 {
       next()
     })
 
+    aseries.push(next => {
+      this._start(next)
+    })
+
     async.series(aseries, cb)
   }
 
+  _start0(cb) { cb() }
+  _start(cb) { cb() }
+
   stop(cb) {
     const aseries = []
-
+      
     aseries.push(next => {
-      if (this._stop) this._stop(next) 
-      else next()
+      this._stop(next) 
     })
 
     aseries.push(next => {
@@ -145,8 +154,15 @@ class Base0 {
       next()
     })
 
+    aseries.push(next => {
+      this._stop9(next) 
+    })
+
     async.series(aseries, cb)
   }
+  
+  _stop(cb) { cb() }
+  _stop9(cb) { cb() }
 
   getPluginCtx() {
     return {}

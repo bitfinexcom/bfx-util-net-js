@@ -1,6 +1,7 @@
 'use strict'
 
 const _ = require('lodash')
+const async = require('async')
 const Facility = require('./base')
 
 class Intervals extends Facility {
@@ -28,8 +29,13 @@ class Intervals extends Facility {
   }
 
   _stop(cb) {
-    _.each(Array.from(this.mem.keys()), k => this.del(k))
-    cb()
+    async.series([
+      next => { super._stop(next) },
+      next => {
+        _.each(Array.from(this.mem.keys()), k => this.del(k))
+        next()
+      }
+    ], cb)
   }
 }
 

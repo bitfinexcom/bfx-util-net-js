@@ -26,11 +26,15 @@ class Api {
     this.ctx = this.caller.getCtx()
 
     if (!this.isCtxReady()) {
-      return cb('ERR_READY')
+      return cb('ERR_API_READY')
     }
 
-    if (!action || !this[action]) {
-      return cb('ERR_ACTION_NOTFOUND')
+    if (!action || _.startsWith(action, '_') || !this[action]) {
+      return cb('ERR_API_ACTION_NOTFOUND')
+    }
+
+    if (!_.isFunction(cb)) {
+      return cb('ERR_API_CB_INVALID')
     }
 
     let args = _.isArray(msg.args) ? msg.args : []
@@ -41,7 +45,7 @@ class Api {
       this[action].apply(this, args)
     } catch(e) {
       console.error(e)
-      cb('ERR_ACTION')
+      cb('ERR_API_ACTION')
     }
   }
 }

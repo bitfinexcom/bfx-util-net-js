@@ -17,11 +17,13 @@ class Facility extends EventEmitter {
   }
 
   init() {
-    const conf = lutils.get_conf_json(
-      this.ctx.env, null, 
-      `${__dirname}/../config/${this.name}.fac.json`
-    )
-    this.conf = conf[this.opts.ns]
+    if (this._hasConf) {
+      const conf = lutils.get_conf_json(
+        this.ctx.env, null, 
+        `${__dirname}/../config/${this.name}.fac.json`
+      )
+      this.conf = conf[this.opts.ns]
+    }
   }
 
   set(k, v) {
@@ -32,8 +34,7 @@ class Facility extends EventEmitter {
     const aseries = []
 
     aseries.push(next => {
-      if (this._start) this._start(next)
-      else next()
+      this._start0(next)
     })
 
     aseries.push(next => {
@@ -41,11 +42,22 @@ class Facility extends EventEmitter {
       next()
     })
 
+    aseries.push(next => {
+      this._start(next)
+    })
+
     async.series(aseries, cb)
   }
 
+  _start0(cb) { cb() }
+  _start(cb) { cb() }
+
   stop(cb) {
     const aseries = []
+
+    aseries.push(next => {
+      this._stop(next)
+    })
 
     aseries.push(next => {
       this.active = 0
@@ -59,12 +71,14 @@ class Facility extends EventEmitter {
     })
 
     aseries.push(next => {
-      if (this._stop) this._stop(next)
-      else next()
+      this._stop9(next)
     })
 
     async.series(aseries, cb)
   }
+  
+  _stop(cb) { cb() }
+  _stop9(cb) { cb() }
 }
 
 module.exports = Facility

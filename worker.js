@@ -28,7 +28,7 @@ const env = cmd.env
 
 const conf = _.merge(
   {},
-  lutils.get_conf_json(env, null, __dirname + '/config/common.json')
+  lutils.get_conf_json(env, null, `${__dirname}/config/common.json`)
 )
 
 const wref = wtype.split('-').reverse()
