@@ -78,8 +78,8 @@ class GrcFacility extends Facility {
     }
 
     _.each(services_pub, srv => {
-      this.link.announce(srv, port, {}, () => {
-        //console.log('grc:announce', srv, port)
+      this.link.announce(srv, port, {}, (err) => {
+        //console.log('grc:announce', srv, port, err)
       })
     })
   }
