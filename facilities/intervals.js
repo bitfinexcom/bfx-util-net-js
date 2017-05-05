@@ -2,7 +2,7 @@
 
 const _ = require('lodash')
 const async = require('async')
-const Facility = require('./base')
+const Facility = require('./base/base')
 
 class Intervals extends Facility {
 

@@ -3,7 +3,7 @@
 const _ = require('lodash')
 const async = require('async')
 const LokiDb = require('lokijs')
-const Facility = require('./base')
+const Facility = require('./base/base')
 
 class Loki extends Facility {
 

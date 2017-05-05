@@ -1,7 +1,7 @@
 'use strict'
 
 const _ = require('lodash')
-const Facility = require('./base')
+const Facility = require('./base/base')
 
 class Api extends Facility {
 

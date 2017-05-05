@@ -5,7 +5,7 @@ const async = require('async')
 const GrBase = require('grenache-nodejs-base')
 const GrWs = require('grenache-nodejs-ws')
 const GrHttp = require('grenache-nodejs-http')
-const Facility = require('./base')
+const Facility = require('./base/base')
 
 class GrcFacility extends Facility {
 
