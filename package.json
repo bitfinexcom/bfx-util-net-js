@@ -11,10 +11,10 @@
     "bitfinex"
   ],
   "dependencies": {
-    "async": "^2.4.0",
-    "grenache-nodejs-base": "0.0.20",
-    "grenache-nodejs-http": "0.0.20",
-    "grenache-nodejs-ws": "0.0.20",
+    "async": "~2.4.0",
+    "grenache-nodejs-base": "0.0.25",
+    "grenache-nodejs-http": "0.0.25",
+    "grenache-nodejs-ws": "0.0.25",
     "lodash": "~4.17.4",
     "lokijs": "^1.4.3",
     "lokue": "0.0.3",
