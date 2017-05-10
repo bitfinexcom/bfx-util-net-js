@@ -63,17 +63,22 @@ class Base0 {
     return (new fmod(this, _.extend({ ns: ns }, opts), _.pick(this.ctx, ['env'])))
   }
 
+  fac_name(name) {
+    return _.camelCase(_.uniq(_.snakeCase(name).split('_')))
+  }
+
   fac_add(type, name, ns, label, opts, cb) {
-    const fns = `${name}_${label}`
     opts.label = label
 
     const fac = this.facility(type, name, ns, opts)
+
+    const fns = `${this.fac_name(name)}_${label}`
     this[fns] = fac
     fac.start(cb)
   }
 
   fac_del(name, label, cb) {
-    const fns = `${name}_${label}`
+    const fns = `${this.fac_name(name)}_${label}`
     const fac = this[fns]
     
     if (!fac) return cb()
