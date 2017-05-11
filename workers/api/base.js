@@ -43,7 +43,7 @@ class Api {
     args.unshift(this.space(service, msg))
     args = args.concat((err, res) => {
       if (isExecuted) return
-      if (err) console.error(err, service, msg)
+      //if (err) console.error(err, service, msg)
       cb(_.isError(err) ? `ERR_API_BASE: ${err.message}` : err, res)
     })
 
