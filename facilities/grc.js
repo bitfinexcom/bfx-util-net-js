@@ -34,7 +34,8 @@ class GrcFacility extends Facility {
       next => { super._start(next) },
       next => {
         this.link = new GrBase.Link({
-          grape: this.conf.grape
+          grape: this.conf.grape,
+          lruMaxAgeLookup: this.opts.lruMaxAgeLookup || 30000
         })
 
         this.link.start()
@@ -134,6 +135,9 @@ class GrcFacility extends Facility {
         return
       }
       isExecuted = true
+      if (err === 'ERR_TIMEOUT') {
+        console.error('ERR_TIMEOUT received', service, action)
+      }
       _cb(err, res)
     }
 
