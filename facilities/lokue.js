@@ -35,6 +35,7 @@ class LokueFacility extends Facility {
           if (!this.q.isReady()) return
           this.q.clearCompletedJobs()
         }, 60000)
+        next()
       }
     ], cb)
   }
