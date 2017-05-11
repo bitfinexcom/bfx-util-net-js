@@ -29,6 +29,12 @@ class LokueFacility extends Facility {
       next => { super._start(next) },
       next => {
         this.q.init(next)
+      },
+      next => {
+        this._clearItv = setInterval(() => {
+          if (!this.q.isReady()) return
+          this.q.clearCompletedJobs()
+        }, 60000)
       }
     ], cb)
   }
