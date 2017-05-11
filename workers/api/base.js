@@ -36,16 +36,23 @@ class Api {
     if (!_.isFunction(cb)) {
       return cb('ERR_API_CB_INVALID')
     }
+      
+    let isExecuted = false
 
     let args = _.isArray(msg.args) ? msg.args : []
     args.unshift(this.space(service, msg))
-    args = args.concat(cb)
+    args = args.concat((err, res) => {
+      if (isExecuted) return
+      if (err) console.error(err, service, msg)
+      cb(_.isError(err) ? `ERR_API_BASE: ${err.message}` : err, res)
+    })
 
     try {
       this[action].apply(this, args)
     } catch(e) {
+      isExecuted = true
       console.error(e)
-      cb('ERR_API_ACTION')
+      cb(`ERR_API_ACTION: ${e.message}`)
     }
   }
 }

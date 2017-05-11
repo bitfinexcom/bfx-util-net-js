@@ -64,6 +64,7 @@ class GrcFacility extends Facility {
     if (this.service && !services_pub) {
       this.service.stop()
       this.service.removeListener('request', this.onRequest.bind(this))
+      delete this.service
       return
     }
    
@@ -120,10 +121,21 @@ class GrcFacility extends Facility {
     this.opts.services = _.difference(this.opts.services, ss)
   }
 
-  req(service, action, args, cb) {
+  req(service, action, args, _cb) {
     if (!_.isString(action)) throw new Error('ERR_GRC_REQ_ACTION_INVALID')
     if (!_.isArray(args)) throw new Error('ERR_GRC_REQ_ARGS_INVALID')
-    if (!_.isFunction(cb)) throw new Error('ERR_GRC_REQ_CB_INVALID')
+    if (!_.isFunction(_cb)) throw new Error('ERR_GRC_REQ_CB_INVALID')
+
+    let isExecuted = false
+
+    const cb = (err, res) => {
+      if (isExecuted) {
+        console.error('ERR_DOUBLE_CB', service, action, JSON.stringify(args))
+        return
+      }
+      isExecuted = true
+      _cb(err, res)
+    }
 
     this.peer.request(service, {
       action: action,
