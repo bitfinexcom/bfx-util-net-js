@@ -51,9 +51,13 @@ class GrcFacility extends Facility {
             break
         }
 
-        this._tickItv = setInterval(() => {
-          this.tick()
-        }, 2500)
+        if (this.peer) {
+          this.peer.init()
+
+          this._tickItv = setInterval(() => {
+            this.tick()
+          }, 2500)
+        }
 
         next()
       }
