@@ -2,11 +2,9 @@
 
 const EventEmitter = require('events')
 const _ = require('lodash')
-const lutils = require('./../utils')
 
 class Plugin extends EventEmitter {
-  
-  constructor(caller, opts, ctx) {
+  constructor (caller, opts, ctx) {
     super()
 
     this.name = 'plugin'
@@ -15,14 +13,14 @@ class Plugin extends EventEmitter {
     this.ctx = ctx
   }
 
-  start(cb) {
+  start (cb) {
     this.active = 1
     cb()
   }
 
-  stop(cb) {
+  stop (cb) {
     this.active = 0
-      
+
     let itv = setInterval(() => {
       if (this.working) return
       clearInterval(itv)

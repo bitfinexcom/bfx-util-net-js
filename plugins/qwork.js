@@ -1,14 +1,12 @@
 'use strict'
 
-const _ = require('lodash')
 const async = require('async')
 const Plugin = require('./base')
 
 class QworkPlugin extends Plugin {
-
-  constructor(caller, opts, ctx) {
+  constructor (caller, opts, ctx) {
     super(caller, opts, ctx)
-    
+
     this.name = 'qwork'
 
     this.working = 0
@@ -22,7 +20,7 @@ class QworkPlugin extends Plugin {
     }, 2)
   }
 
-  work() {
+  work () {
     if (!this.active) return
 
     if (this.queue.length() > 10) {
@@ -39,15 +37,15 @@ class QworkPlugin extends Plugin {
 
         if (data && data[1]) {
           data = data[1]
-          try { 
+          try {
             data = JSON.parse(data)
-          } catch(e) {
+          } catch (e) {
             data = null
           }
 
           if (data) {
             this.queue.push(data)
-	  }
+          }
         }
 
         this.work()
@@ -55,7 +53,7 @@ class QworkPlugin extends Plugin {
     )
   }
 
-  start(cb) {
+  start (cb) {
     const aseries = []
 
     aseries.push(next => {
@@ -70,7 +68,7 @@ class QworkPlugin extends Plugin {
     async.series(aseries, cb)
   }
 
-  stop(cb) {
+  stop (cb) {
     const aseries = []
 
     aseries.push(next => {
@@ -86,7 +84,7 @@ class QworkPlugin extends Plugin {
       this.stop(next)
     })
 
-    async.series(aseries ,cb)
+    async.series(aseries, cb)
   }
 }
 
