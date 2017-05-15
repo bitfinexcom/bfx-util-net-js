@@ -1,13 +1,11 @@
 'use strict'
 
-const _ = require('lodash')
 const async = require('async')
 const Lokue = require('lokue')
 const Facility = require('./base/base')
 
 class LokueFacility extends Facility {
-
-  constructor(caller, opts, ctx) {
+  constructor (caller, opts, ctx) {
     super(caller, opts, ctx)
 
     this.name = 'lokue'
@@ -15,7 +13,7 @@ class LokueFacility extends Facility {
     this.init()
   }
 
-  init() {
+  init () {
     super.init()
 
     this.q = new Lokue({
@@ -24,7 +22,7 @@ class LokueFacility extends Facility {
     })
   }
 
-  _start(cb) {
+  _start (cb) {
     async.series([
       next => { super._start(next) },
       next => {
@@ -40,7 +38,7 @@ class LokueFacility extends Facility {
     ], cb)
   }
 
-  _stop(cb) {
+  _stop (cb) {
     async.series([
       next => { super._stop(next) },
       next => {

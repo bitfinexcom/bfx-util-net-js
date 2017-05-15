@@ -1,11 +1,9 @@
 'use strict'
 
-const _ = require('lodash')
 const Facility = require('./base/base')
 
 class Api extends Facility {
-
-  constructor(caller, opts, ctx) {
+  constructor (caller, opts, ctx) {
     super(caller, opts, ctx)
 
     this.name = 'api'
@@ -13,7 +11,7 @@ class Api extends Facility {
     this.init()
   }
 
-  init() {
+  init () {
     super.init()
 
     const ApiClass = this.getApi(this.opts.path)
@@ -25,7 +23,7 @@ class Api extends Facility {
     })
   }
 
-  getApi(name) {
+  getApi (name) {
     return require(`${__dirname}/../workers/api/${name}`)
   }
 }

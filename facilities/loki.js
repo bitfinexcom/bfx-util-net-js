@@ -1,28 +1,26 @@
 'use strict'
 
-const _ = require('lodash')
 const async = require('async')
 const LokiDb = require('lokijs')
 const Facility = require('./base/base')
 
 class Loki extends Facility {
-
-  constructor(caller, opts, ctx) {
+  constructor (caller, opts, ctx) {
     super(caller, opts, ctx)
-    
+
     this.name = 'loki'
 
     this.init()
   }
 
-  init() {
+  init () {
     super.init()
     this.db = new LokiDb(
       `${__dirname}/../db/${this.name}_${this.opts.name}_${this.opts.label}.db.json`
     )
   }
 
-  _start(cb) {
+  _start (cb) {
     async.series([
       next => { super._start(next) },
       next => {
@@ -33,7 +31,7 @@ class Loki extends Facility {
     ], cb)
   }
 
-  _stop(cb) {
+  _stop (cb) {
     async.series([
       next => { super._stop(next) },
       next => {

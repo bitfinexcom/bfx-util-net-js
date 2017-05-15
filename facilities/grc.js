@@ -8,28 +8,27 @@ const GrHttp = require('grenache-nodejs-http')
 const Facility = require('./base/base')
 
 class GrcFacility extends Facility {
-
-  constructor(caller, opts, ctx) {
+  constructor (caller, opts, ctx) {
     super(caller, opts, ctx)
-    
+
     this.name = 'grc'
     this._hasConf = true
 
     this.init()
   }
 
-  onRequest(rid, service, payload, handler) {
+  onRequest (rid, service, payload, handler) {
     if (this.api) {
       const api = this.api
       api.handle(service, payload, (err, res) => {
         handler.reply([err, res])
-      }) 
+      })
     } else {
       this.emit('request', rid, service, payload, handler)
     }
   }
 
-  _start(cb) {
+  _start (cb) {
     async.series([
       next => { super._start(next) },
       next => {
@@ -64,17 +63,17 @@ class GrcFacility extends Facility {
     ], cb)
   }
 
-  tick() {
-    const services_pub = _.isArray(this.opts.services) && this.opts.services.length ? this.opts.services : null
-    if (this.service && !services_pub) {
+  tick () {
+    const pubServices = _.isArray(this.opts.services) && this.opts.services.length ? this.opts.services : null
+    if (this.service && !pubServices) {
       this.service.stop()
       this.service.removeListener('request', this.onRequest.bind(this))
       delete this.service
       return
     }
-   
-    if (!services_pub || !this.opts.svc_port) return
-    
+
+    if (!pubServices || !this.opts.svc_port) return
+
     const port = this.opts.svc_port
 
     if (!this.service) {
@@ -83,14 +82,15 @@ class GrcFacility extends Facility {
       this.service.on('request', this.onRequest.bind(this))
     }
 
-    _.each(services_pub, srv => {
+    _.each(pubServices, srv => {
       this.link.announce(srv, port, {}, (err) => {
-        //console.log('grc:announce', srv, port, err)
+        if (err) console.error(err)
+        // console.log('grc:announce', srv, port, err)
       })
     })
   }
 
-  _stop(cb) {
+  _stop (cb) {
     async.series([
       next => { super._stop(next) },
       next => {
@@ -106,11 +106,11 @@ class GrcFacility extends Facility {
     ], cb)
   }
 
-  setServices(ss) {
+  setServices (ss) {
     this.opts.services = ss
   }
 
-  addServices(ss) {
+  addServices (ss) {
     if (!_.isArray(this.opts.services)) {
       this.opts.services = []
     }
@@ -118,18 +118,18 @@ class GrcFacility extends Facility {
     this.opts.services = _.union(this.opts.services, ss)
   }
 
-  delServices(ss) {
-     if (!_.isArray(this.opts.services)) {
+  delServices (ss) {
+    if (!_.isArray(this.opts.services)) {
       this.opts.servies = []
     }
 
     this.opts.services = _.difference(this.opts.services, ss)
   }
 
-  req(service, action, args, _cb) {
-    if (!_.isString(action)) throw new Error('ERR_GRC_REQ_ACTION_INVALID')
-    if (!_.isArray(args)) throw new Error('ERR_GRC_REQ_ARGS_INVALID')
-    if (!_.isFunction(_cb)) throw new Error('ERR_GRC_REQ_CB_INVALID')
+  req (service, action, args, _cb) {
+    if (!_.isString(action)) return _cb(new Error('ERR_GRC_REQ_ACTION_INVALID'))
+    if (!_.isArray(args)) return _cb(new Error('ERR_GRC_REQ_ARGS_INVALID'))
+    if (!_.isFunction(_cb)) return _cb(new Error('ERR_GRC_REQ_CB_INVALID'))
 
     let isExecuted = false
 
@@ -142,12 +142,12 @@ class GrcFacility extends Facility {
       if (err === 'ERR_TIMEOUT') {
         console.error('ERR_TIMEOUT received', service, action)
       }
-      _cb(err, res)
+      _cb(err ? new Error(err) : null, res)
     }
 
     this.peer.request(service, {
       action: action,
-      args: args 
+      args: args
     }, {}, (err, res) => {
       if (err) return cb(err)
       err = res[0]
@@ -157,4 +157,4 @@ class GrcFacility extends Facility {
   }
 }
 
-module.exports = GrcFacility 
+module.exports = GrcFacility

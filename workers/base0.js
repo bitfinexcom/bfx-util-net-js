@@ -1,22 +1,19 @@
 'use strict'
 
-const os = require('os')
 const fs = require('fs')
 const _ = require('lodash')
 const async = require('async')
-const util = require('util')
 const lutils = require('./../utils.js')
 
 class Base0 {
-
-  constructor(conf, ctx) {
+  constructor (conf, ctx) {
     this.conf = conf
     this.ctx = ctx
     this.wtype = ctx.wtype
-    this.prefix = this.wtype    
+    this.prefix = this.wtype
   }
 
-  init() {
+  init () {
     this.status = {}
 
     this.conf.init = {
@@ -30,94 +27,94 @@ class Base0 {
     this.loadStatus()
   }
 
-  loadConf(c, n = null) {
+  loadConf (c, n = null) {
     _.merge(
       this.conf,
       lutils.get_conf_json(this.ctx.env, n, `${__dirname}/../config/${c}.json`)
     )
   }
 
-  facility(type, name, ns, opts) {
-    let fmod = null
+  facility (type, name, ns, opts) {
+    let Fmod = null
     let rdir = null
 
     switch (type) {
       case 'plg':
         rdir = 'plugins'
-      break
+        break
       default:
         rdir = 'facilities'
-      break
+        break
     }
-    
+
     try {
-      fmod = require(`${__dirname}/../${rdir}/${name}.js`)
-    } catch(e) {
+      Fmod = require(`${__dirname}/../${rdir}/${name}.js`)
+    } catch (e) {
       console.log(e)
     }
 
-    if (!fmod) {
+    if (!Fmod) {
       return null
     }
 
-    return (new fmod(this, _.extend({ ns: ns }, opts), _.pick(this.ctx, ['env'])))
+    return (new Fmod(this, _.extend({ ns: ns }, opts), _.pick(this.ctx, ['env'])))
   }
 
-  fac_name(name) {
+  nameFac (name) {
     return _.camelCase(_.uniq(_.snakeCase(name).split('_')))
   }
 
-  fac_add(type, name, ns, label, opts, cb) {
+  addFac (type, name, ns, label, opts, cb) {
     opts.label = label
 
     const fac = this.facility(type, name, ns, opts)
 
-    const fns = `${this.fac_name(name)}_${label}`
+    const fns = `${this.nameFac(name)}_${label}`
     this[fns] = fac
     fac.start(cb)
   }
 
-  fac_del(name, label, cb) {
-    const fns = `${this.fac_name(name)}_${label}`
+  delFac (name, label, cb) {
+    const fns = `${this.nameFac(name)}_${label}`
     const fac = this[fns]
-    
+
     if (!fac) return cb()
-    
+
     delete this[fns]
     fac.stop(cb)
   }
 
-  facs(dir, list, cb) {
+  facs (dir, list, cb) {
     const aseries = []
 
     _.each(list, p => {
       aseries.push(next => {
         this[dir].apply(this, p.concat([next]))
-      })     
+      })
     })
- 
+
     async.series(aseries, cb)
   }
 
-  loadStatus() {
+  loadStatus () {
     try {
       _.extend(this.status, JSON.parse(fs.readFileSync(
         `${__dirname}/../status/${this.prefix}.json`, 'UTF-8')
       ))
-    } catch(e) {}
+    } catch (e) {}
   }
 
-  saveStatus() {
+  saveStatus () {
     try {
       fs.writeFile(`${__dirname}/../status/${this.prefix}.json`, JSON.stringify(this.status), () => {})
-    } catch(e) {
+    } catch (e) {
       console.error(e)
     }
   }
 
-  start(cb) {
+  start (cb) {
     const aseries = []
-    
+
     aseries.push(next => {
       this.facs('fac_add', this.conf.init.facilities, next)
     })
@@ -138,14 +135,14 @@ class Base0 {
     async.series(aseries, cb)
   }
 
-  _start0(cb) { cb() }
-  _start(cb) { cb() }
+  _start0 (cb) { cb() }
+  _start (cb) { cb() }
 
-  stop(cb) {
+  stop (cb) {
     const aseries = []
-      
+
     aseries.push(next => {
-      this._stop(next) 
+      this._stop(next)
     })
 
     aseries.push(next => {
@@ -160,16 +157,16 @@ class Base0 {
     })
 
     aseries.push(next => {
-      this._stop9(next) 
+      this._stop9(next)
     })
 
     async.series(aseries, cb)
   }
-  
-  _stop(cb) { cb() }
-  _stop9(cb) { cb() }
 
-  getPluginCtx() {
+  _stop (cb) { cb() }
+  _stop9 (cb) { cb() }
+
+  getPluginCtx () {
     return {}
   }
 }
