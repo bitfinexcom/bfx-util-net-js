@@ -1,6 +1,6 @@
 'use strict'
 
-const fs = require('fs')
+const path = require('path')
 const _ = require('lodash')
 const lutils = require('./utils.js')
 
@@ -32,21 +32,21 @@ const conf = _.merge(
 )
 
 const wref = wtype.split('-').reverse()
-const ctx = { 
+const ctx = {
   wtype: wtype,
-  env: env 
+  env: env
 }
 
 _.each(cmd, (v, k) => {
-  ctx[k] = v  
+  ctx[k] = v
 })
 
 const pname = [wtype]
 pname.push(process.pid)
 process.title = pname.join('-')
 
-const handlerClass = require(__dirname + '/workers/' + wref.join('.'))
-const hnd = new handlerClass(conf, ctx)
+const HandlerClass = require(path.join(__dirname, '/workers/', wref.join('.')))
+const hnd = new HandlerClass(conf, ctx)
 
 let shutdown = 0
 
@@ -62,5 +62,5 @@ process.on('SIGINT', () => {
   console.log('BKW', pname, 'shutting down')
   hnd.stop(() => {
     process.exit()
-  }) 
+  })
 })

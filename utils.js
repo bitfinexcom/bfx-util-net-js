@@ -1,12 +1,12 @@
 const fs = require('fs')
 const _ = require('lodash')
 
-const get_conf_json = (env, type, path) => {
-  const conf = JSON.parse(fs.readFileSync(path, 'utf8'));
+const getJSONConf = (env, type, path) => {
+  const conf = JSON.parse(fs.readFileSync(path, 'utf8'))
   if (!_.isObject(conf)) {
     return {}
   }
-  
+
   let res = {}
 
   if (type) {
@@ -18,13 +18,13 @@ const get_conf_json = (env, type, path) => {
   return res
 }
 
-function elapsed(t) {
+function elapsed (t) {
   var precision = 3
-  var elapsed = process.hrtime(t)[1] / 1000000; // divide by a million to get nano to milli
-  return process.hrtime(t)[0] + "s," + elapsed.toFixed(precision) + "ms"
+  var elapsed = process.hrtime(t)[1] / 1000000 // divide by a million to get nano to milli
+  return process.hrtime(t)[0] + 's,' + elapsed.toFixed(precision) + 'ms'
 }
 
 module.exports = {
-  get_conf_json: get_conf_json,
+  get_conf_json: getJSONConf,
   elapsed: elapsed
 }
