@@ -40,13 +40,13 @@ class GrcFacility extends Facility {
         this.link.start()
 
         this.peer = null
+        this.peer_srv = null
 
         switch (this.conf.transport) {
           case 'ws':
-            this.peer = new GrWs.PeerRPC(this.link, {})
-            break
           case 'http':
-            this.peer = new GrHttp.PeerRPC(this.link, {})
+            this.peer = new GrWs.PeerRPCClient(this.link, {})
+            this.peer_srv = new GrWs.PeerRPCServer(this.link, {})
             break
         }
 
@@ -77,7 +77,7 @@ class GrcFacility extends Facility {
     const port = this.opts.svc_port
 
     if (!this.service) {
-      this.service = this.peer.transport('server')
+      this.service = this.peer_srv.transport('server')
       this.service.listen(port || 0)
       this.service.on('request', this.onRequest.bind(this))
     }
