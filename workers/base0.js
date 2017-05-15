@@ -116,7 +116,7 @@ class Base0 {
     const aseries = []
 
     aseries.push(next => {
-      this.facs('fac_add', this.conf.init.facilities, next)
+      this.facs('addFac', this.conf.init.facilities, next)
     })
 
     aseries.push(next => {
@@ -146,7 +146,7 @@ class Base0 {
     })
 
     aseries.push(next => {
-      this.facs('fac_del', _.map(this.conf.init.facilities, f => {
+      this.facs('delFac', _.map(this.conf.init.facilities, f => {
         return [f[1], f[3]]
       }), next)
     })
