@@ -21,7 +21,7 @@ class GrcFacility extends Facility {
     if (this.api) {
       const api = this.api
       api.handle(service, payload, (err, res) => {
-        handler.reply([err, res])
+        handler.reply(err, res)
       })
     } else {
       this.emit('request', rid, service, payload, handler)
@@ -43,8 +43,11 @@ class GrcFacility extends Facility {
         this.peer_srv = null
 
         switch (this.conf.transport) {
-          case 'ws':
           case 'http':
+            this.peer = new GrHttp.PeerRPCClient(this.link, {})
+            this.peer_srv = new GrHttp.PeerRPCServer(this.link, {})
+            break
+          case 'ws':
             this.peer = new GrWs.PeerRPCClient(this.link, {})
             this.peer_srv = new GrWs.PeerRPCServer(this.link, {})
             break
@@ -52,6 +55,7 @@ class GrcFacility extends Facility {
 
         if (this.peer) {
           this.peer.init()
+          this.peer_srv.init()
 
           this._tickItv = setInterval(() => {
             this.tick()
@@ -148,12 +152,7 @@ class GrcFacility extends Facility {
     this.peer.request(service, {
       action: action,
       args: args
-    }, {}, (err, res) => {
-      if (err) return cb(err)
-      err = res[0]
-      res = res[1]
-      cb(err, res)
-    })
+    }, {}, cb)
   }
 }
 
