@@ -8,7 +8,7 @@ class Api {
     this.opts = opts
   }
 
-  space (service, msg) {
+  _space (service, msg) {
     return {
       service: service,
       svp: service.split(':')
@@ -39,7 +39,7 @@ class Api {
     let isExecuted = false
 
     let args = _.isArray(msg.args) ? msg.args : []
-    args.unshift(this.space(service, msg))
+    args.unshift(this._space(service, msg))
     args = args.concat((err, res) => {
       if (isExecuted) return
       // if (err) console.error(err, service, msg)
