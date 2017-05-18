@@ -59,7 +59,7 @@ class GrcFacility extends Facility {
 
           this._tickItv = setInterval(() => {
             this.tick()
-          }, 2500)
+          }, 5000)
         }
 
         next()

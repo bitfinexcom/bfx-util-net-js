@@ -27,6 +27,14 @@ class Loki extends Facility {
         if (this.opts.persist) {
           this.db.loadDatabase({}, next)
         } else next()
+      },
+      next => {
+        if (this.opts.persist) {
+          this._saveItv = setInterval(() => {
+            this.db.saveDatabase()
+          }, 60000)
+        }
+        next()
       }
     ], cb)
   }
@@ -36,6 +44,7 @@ class Loki extends Facility {
       next => { super._stop(next) },
       next => {
         if (this.opts.persist) {
+          clearInterval(this._saveItv)
           this.db.saveDatabase(next)
         } else next()
       }
