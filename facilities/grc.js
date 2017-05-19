@@ -154,6 +154,31 @@ class GrcFacility extends Facility {
       args: args
     }, {}, cb)
   }
+
+  map (service, action, args, _cb) {
+    if (!_.isString(action)) return _cb(new Error('ERR_GRC_REQ_ACTION_INVALID'))
+    if (!_.isArray(args)) return _cb(new Error('ERR_GRC_REQ_ARGS_INVALID'))
+    if (!_.isFunction(_cb)) return _cb(new Error('ERR_GRC_REQ_CB_INVALID'))
+
+    let isExecuted = false
+
+    const cb = (err, res) => {
+      if (isExecuted) {
+        console.error('ERR_DOUBLE_CB', service, action, JSON.stringify(args))
+        return
+      }
+      isExecuted = true
+      if (err === 'ERR_TIMEOUT') {
+        console.error('ERR_TIMEOUT received', service, action)
+      }
+      _cb(err ? new Error(err) : null, res)
+    }
+
+    this.peer.map(service, {
+      action: action,
+      args: args
+    }, {}, cb)
+  }
 }
 
 module.exports = GrcFacility
