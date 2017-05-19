@@ -34,7 +34,7 @@ class GrcFacility extends Facility {
       next => {
         this.link = new GrBase.Link({
           grape: this.conf.grape,
-          lruMaxAgeLookup: this.opts.lruMaxAgeLookup || 30000
+          lruMaxAgeLookup: this.opts.lruMaxAgeLookup || 10000
         })
 
         this.link.start()
