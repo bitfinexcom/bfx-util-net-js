@@ -23,6 +23,6 @@ All new repositories should inheritate from the closest parent: `bfx-coin-eth-js
 * Class names: parent is leftmost (i.e `WkrCoinApiEth`)
 
 
-## Integagrate UpStream changes
+## Integrate UpStream changes
 
 * bash upstream_merge.sh
