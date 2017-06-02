@@ -130,7 +130,7 @@ class GrcFacility extends Facility {
     this.opts.services = _.difference(this.opts.services, ss)
   }
 
-  req (service, action, args, _cb) {
+  req (service, action, args, opts = {}, _cb) {
     if (!_.isString(action)) return _cb(new Error('ERR_GRC_REQ_ACTION_INVALID'))
     if (!_.isArray(args)) return _cb(new Error('ERR_GRC_REQ_ARGS_INVALID'))
     if (!_.isFunction(_cb)) return _cb(new Error('ERR_GRC_REQ_CB_INVALID'))
@@ -152,10 +152,12 @@ class GrcFacility extends Facility {
     this.peer.request(service, {
       action: action,
       args: args
-    }, {}, cb)
+    }, _.defaults({
+      timeout: 120000
+    }, opts), cb)
   }
 
-  map (service, action, args, _cb) {
+  map (service, action, args, opts = {}, _cb) {
     if (!_.isString(action)) return _cb(new Error('ERR_GRC_REQ_ACTION_INVALID'))
     if (!_.isArray(args)) return _cb(new Error('ERR_GRC_REQ_ARGS_INVALID'))
     if (!_.isFunction(_cb)) return _cb(new Error('ERR_GRC_REQ_CB_INVALID'))
@@ -177,7 +179,9 @@ class GrcFacility extends Facility {
     this.peer.map(service, {
       action: action,
       args: args
-    }, {}, cb)
+    }, _.defaults({
+      timeout: 120000
+    }, opts), cb)
   }
 }
 
