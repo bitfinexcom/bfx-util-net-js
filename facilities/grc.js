@@ -34,6 +34,8 @@ class GrcFacility extends Facility {
       next => {
         this.link = new GrBase.Link({
           grape: this.conf.grape,
+          pingTimeout: 20000,
+          requestTimeout: 30000,
           lruMaxAgeLookup: this.opts.lruMaxAgeLookup || 10000
         })
 
@@ -44,11 +46,15 @@ class GrcFacility extends Facility {
 
         switch (this.conf.transport) {
           case 'http':
-            this.peer = new GrHttp.PeerRPCClient(this.link, {})
+            this.peer = new GrHttp.PeerRPCClient(this.link, {
+              maxActiveKeyDests: this.opts.maxActiveKeyDests
+            })
             this.peer_srv = new GrHttp.PeerRPCServer(this.link, {})
             break
           case 'ws':
-            this.peer = new GrWs.PeerRPCClient(this.link, {})
+            this.peer = new GrWs.PeerRPCClient(this.link, {
+              maxActiveKeyDests: this.opts.maxActiveKeyDests
+            })
             this.peer_srv = new GrWs.PeerRPCServer(this.link, {})
             break
         }
