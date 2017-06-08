@@ -24,26 +24,14 @@
     "node": ">=6.0"
   },
   "main": "index.js",
-  "directories": {
-    "example": "examples",
-    "test": "test"
-  },
-  "devDependencies": {
-    "chai": "~3.2.0",
-    "mocha": "~2.2.5"
-  },
   "scripts": {
-    "test": "make test"
+    "test": "mocha"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bitfinexcom/bfx-svc-js.git"
   },
-  "bugs": {
-    "url": "https://github.com/bitfinexcom/bfx-svc-js/issues"
-  },
-  "homepage": "https://github.com/bitfinexcom/bfx-svc-js",
   "maintainers": [
     {
       "name": "prdn",
