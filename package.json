@@ -37,5 +37,8 @@
       "name": "prdn",
       "email": "paolo@bitfinex.com"
     }
-  ]
+  ],
+  "devDependencies": {
+    "mocha": "^3.4.2"
+  }
 }
