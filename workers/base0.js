@@ -98,14 +98,16 @@ class Base0 {
 
   loadStatus () {
     try {
-      _.extend(this.status, JSON.parse(fs.readFileSync(
+      const status = JSON.parse(fs.readFileSync(
         `${__dirname}/../status/${this.prefix}.json`, 'UTF-8')
-      ))
+      )
+      _.extend(this.status, _.isObject(status) ? status : {})
     } catch (e) {}
   }
 
   saveStatus () {
     try {
+      console.log('saving status', this.status)
       fs.writeFile(`${__dirname}/../status/${this.prefix}.json`, JSON.stringify(this.status), () => {})
     } catch (e) {
       console.error(e)

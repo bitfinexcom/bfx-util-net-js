@@ -1,7 +1,10 @@
 'use strict'
 
+const fs = require('fs')
 const async = require('async')
 const LokiDb = require('lokijs')
+const LokiFsAdapter = require('lokijs/src/loki-fs-structured-adapter');
+
 const Facility = require('./base/base')
 
 class Loki extends Facility {
@@ -9,14 +12,19 @@ class Loki extends Facility {
     super(caller, opts, ctx)
 
     this.name = 'loki'
+    this.opts.dbPath = `${__dirname}/../db/${this.name}_${this.opts.name}_${this.opts.label}.db.json`
 
     this.init()
   }
 
   init () {
     super.init()
+
+    const adapter = new LokiFsAdapter()
+
     this.db = new LokiDb(
-      `${__dirname}/../db/${this.name}_${this.opts.name}_${this.opts.label}.db.json`
+      this.opts.dbPath,
+      { adapter: adapter }
     )
   }
 
@@ -25,7 +33,12 @@ class Loki extends Facility {
       next => { super._start(next) },
       next => {
         if (this.opts.persist) {
-          this.db.loadDatabase({}, next)
+          try {
+            fs.statSync(this.opts.dbPath)
+            this.db.loadDatabase({}, next)
+          } catch(e) {
+            next()
+          }
         } else next()
       },
       next => {
