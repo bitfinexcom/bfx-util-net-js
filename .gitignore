@@ -1,5 +1,6 @@
 *.swo
 *.swp
+.DS_Store
 node_modules
 !config/*.json.example
 config/*.json
