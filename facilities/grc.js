@@ -34,9 +34,8 @@ class GrcFacility extends Facility {
       next => {
         this.link = new GrBase.Link({
           grape: this.conf.grape,
-          pingTimeout: 20000,
-          requestTimeout: 30000,
-          lruMaxAgeLookup: this.opts.lruMaxAgeLookup || 10000
+          requestTimeout: this.opts.linkRequestTimeout || 2500,
+          lruMaxAgeLookup: this.opts.linkRruMaxAgeLookup || 10000
         })
 
         this.link.start()

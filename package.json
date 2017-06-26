@@ -17,7 +17,7 @@
     "grenache-nodejs-ws": "^0.1.0",
     "lodash": "~4.17.4",
     "lokijs": "^1.4.3",
-    "lokue": "0.0.3",
+    "lokue": "0.0.5",
     "yargs": "^6.3.0"
   },
   "engine": {
