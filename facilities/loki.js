@@ -3,7 +3,7 @@
 const fs = require('fs')
 const async = require('async')
 const LokiDb = require('lokijs')
-const LokiFsAdapter = require('lokijs/src/loki-fs-structured-adapter');
+const LokiFsAdapter = require('lokijs/src/loki-fs-structured-adapter')
 
 const Facility = require('./base/base')
 
@@ -36,7 +36,7 @@ class Loki extends Facility {
           try {
             fs.statSync(this.opts.dbPath)
             this.db.loadDatabase({}, next)
-          } catch(e) {
+          } catch (e) {
             next()
           }
         } else next()
