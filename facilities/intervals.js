@@ -18,7 +18,10 @@ class Intervals extends Facility {
   }
 
   add (k, f, w) {
-    this.mem.set(k, setInterval(f, w))
+    this.mem.set(k, setInterval(() => {
+      if (!this.caller.active) return
+      f() 
+    }, w))
   }
 
   del (k) {
