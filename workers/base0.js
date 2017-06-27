@@ -118,7 +118,14 @@ class Base0 {
     const aseries = []
 
     aseries.push(next => {
-      this.facs('addFac', this.conf.init.facilities, next)
+      this.facs('addFac', this.conf.init.facilities, (err) => {
+        // crash early to avoid silent fails in facilities
+        if (err) {
+          console.trace()
+          throw err
+        }
+        next()
+      })
     })
 
     aseries.push(next => {
