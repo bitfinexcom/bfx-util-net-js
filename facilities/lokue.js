@@ -32,6 +32,7 @@ class LokueFacility extends Facility {
         this._clearItv = setInterval(() => {
           if (!this.q.isReady()) return
           this.q.clearCompletedJobs()
+          this.q.clearErrorJobs()
         }, 60000)
         next()
       }
