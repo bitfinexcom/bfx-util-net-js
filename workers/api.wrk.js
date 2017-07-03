@@ -21,7 +21,7 @@ class WrkApi extends Base {
 
   getApiConf () {
     return {
-      path: this.conf.util.apiBfxClass
+      path: null
     }
   }
 
