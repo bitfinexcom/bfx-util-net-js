@@ -11,7 +11,7 @@ class WrkApi extends Base {
     this.conf.init.facilities.push(
       ['fac', 'grc', 'p0', 'bfx', {}],
       ['fac', 'grc', 'p0', 'bfx_api', this.getApiGrcConf()],
-      ['fac', 'api', 'bfx', 'bfx_util', this.getApiConf()]
+      ['fac', 'api', 'bfx', 'bfx_main', this.getApiConf()]
     )
   }
 
@@ -29,7 +29,7 @@ class WrkApi extends Base {
     const ctx = super.getPluginCtx(type)
 
     switch (type) {
-      case 'api_bfx_util':
+      case 'api_bfx_main':
         ctx.grc_bfx = this.grc_bfx
         break
     }
@@ -40,8 +40,8 @@ class WrkApi extends Base {
   _start (cb) {
     async.series([ next => { super._start(next) },
       next => {
-        if (this.api_bfx_util) {
-          this.grc_bfx_api.set('api', this.api_bfx_util.api)
+        if (this.api_bfx_main) {
+          this.grc_bfx_api.set('api', this.api_bfx_main.api)
         }
 
         next()
