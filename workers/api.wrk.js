@@ -11,7 +11,7 @@ class WrkApi extends Base {
     this.conf.init.facilities.push(
       ['fac', 'grc', 'p0', 'bfx', {}],
       ['fac', 'grc', 'p0', 'bfx_api', {
-        services: ['rest:coin:admin'],
+        services: this.conf.apiBfxServices,
         svc_port: this.conf.net.util.apiBfxPort
       }],
       ['fac', 'api', 'bfx', 'bfx_util', {
