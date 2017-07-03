@@ -15,7 +15,7 @@ class WrkApi extends Base {
         svc_port: this.conf.net.util.apiBfxPort
       }],
       ['fac', 'api', 'bfx', 'bfx_util', {
-        path: this.conf.bfx_api_class
+        path: this.conf.apiBfxClass
       }]
     )
   }
