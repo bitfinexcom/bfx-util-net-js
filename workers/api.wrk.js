@@ -10,14 +10,15 @@ class WrkApi extends Base {
 
     this.conf.init.facilities.push(
       ['fac', 'grc', 'p0', 'bfx', {}],
-      ['fac', 'grc', 'p0', 'bfx_api', {
-        services: this.conf.apiBfxServices,
-        svc_port: this.conf.net.util.apiBfxPort
-      }],
+      ['fac', 'grc', 'p0', 'bfx_api', this.getApiConf()],
       ['fac', 'api', 'bfx', 'bfx_util', {
         path: this.conf.apiBfxClass
       }]
     )
+  }
+
+  getApiGrcConf () {
+    return { svc_port: 0, services: [] }
   }
 
   getPluginCtx (type) {
