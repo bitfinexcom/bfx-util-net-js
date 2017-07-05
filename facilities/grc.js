@@ -3,7 +3,6 @@
 const _ = require('lodash')
 const async = require('async')
 const GrBase = require('grenache-nodejs-base')
-const GrWs = require('grenache-nodejs-ws')
 const GrHttp = require('grenache-nodejs-http')
 const Facility = require('./base/base')
 
