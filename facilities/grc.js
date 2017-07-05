@@ -52,7 +52,9 @@ class GrcFacility extends Facility {
             this.peer = new GrHttp.PeerRPCClient(this.link, {
               maxActiveKeyDests: this.opts.maxActiveKeyDests
             })
-            this.peer_srv = new GrHttp.PeerRPCServer(this.link, {})
+            this.peer_srv = new GrHttp.PeerRPCServer(this.link, {
+              timeout: this.opts.server_timeout || 600000
+            })
             break
           case 'ws':
             this.peer = new GrWs.PeerRPCClient(this.link, {
