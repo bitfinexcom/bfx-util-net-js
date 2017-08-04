@@ -38,7 +38,7 @@ const ctx = {
 }
 
 _.each(cmd, (v, k) => {
-  ctx[k] = v
+  ctx[_.camelCase(k)] = v
 })
 
 const pname = [wtype]

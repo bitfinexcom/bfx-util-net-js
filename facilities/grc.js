@@ -90,14 +90,8 @@ class GrcFacility extends Facility {
     this._ticking = now
 
     let pubServices = this.opts.services
-    if (!_.isArray(pubServices) || !pubServices.length) pubServices = null
-
-    if (this.service && !pubServices) {
-      this.service.stop()
-      this.service.removeListener('request', this.onRequest.bind(this))
-      delete this.service
-      this._ticking = null
-      return
+    if (!_.isArray(pubServices) || !pubServices.length) {
+      pubServices = null
     }
 
     if (!pubServices || !this.opts.svc_port) {
@@ -116,12 +110,8 @@ class GrcFacility extends Facility {
     async.auto({
       announce: next => {
         async.eachSeries(pubServices, (srv, next) => {
-          const t1 = Date.now()
           this.link.announce(srv, port, {}, (err) => {
             if (err) console.error(err)
-            const tdiff = Date.now() - t1
-            if  (tdiff > 2500) console.error('ANNOUNCE', srv, port, 'took too long', tdiff)
-            //console.log('grc:announce', srv, port, err)
             next()
           })
         }, next)
