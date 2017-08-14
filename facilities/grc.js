@@ -2,6 +2,7 @@
 
 const _ = require('lodash')
 const async = require('async')
+const GrLink = require('grenache-nodejs-link')
 const GrBase = require('grenache-nodejs-base')
 const GrHttp = require('grenache-nodejs-http')
 const Facility = require('./base/base')
@@ -35,7 +36,7 @@ class GrcFacility extends Facility {
     async.series([
       next => { super._start(next) },
       next => {
-        this.link = new GrBase.Link({
+        this.link = new GrLink({
           grape: this.conf.grape,
           requestTimeout: this.opts.linkRequestTimeout || 2500,
           lruMaxAgeLookup: this.opts.linkRruMaxAgeLookup || 10000

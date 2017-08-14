@@ -12,8 +12,9 @@
   ],
   "dependencies": {
     "async": "~2.5.0",
-    "grenache-nodejs-base": "^0.4.0",
-    "grenache-nodejs-http": "^0.4.0",
+    "grenache-nodejs-link": "^0.5.0",
+    "grenache-nodejs-base": "^0.5.0",
+    "grenache-nodejs-http": "^0.5.0",
     "lodash": "~4.17.4",
     "lokijs": "^1.4.3",
     "lokue": "^0.0.6",
