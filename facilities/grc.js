@@ -180,7 +180,7 @@ class GrcFacility extends Facility {
     this.peer.request(service, {
       action: action,
       args: args
-    }, _.defaults({
+    }, _.defaults({}, {
       timeout: 120000
     }, opts), cb)
   }
@@ -207,7 +207,7 @@ class GrcFacility extends Facility {
     this.peer.map(service, {
       action: action,
       args: args
-    }, _.defaults({
+    }, _.defaults({}, {
       timeout: 120000
     }, opts), cb)
   }
