@@ -4,7 +4,6 @@ const async = require('async')
 const Base = require('./base')
 
 class WrkApi extends Base {
-
   init () {
     super.init()
 
@@ -15,7 +14,7 @@ class WrkApi extends Base {
   }
 
   getGrcConf () {
-    return { 
+    return {
       svc_port: this.ctx.apiPort || 0,
       services: []
     }
