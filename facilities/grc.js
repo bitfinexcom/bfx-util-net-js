@@ -103,8 +103,14 @@ class GrcFacility extends Facility {
     const port = this.opts.svc_port
 
     if (!this.service) {
+      if (!port) {
+        console.error('no port in config set')
+        console.error('set in config file or via commandline (--apiPort=$PORT)')
+        throw new Error('ERR_NO_PORT')
+      }
+
       this.service = this.peer_srv.transport('server')
-      this.service.listen(port || 0)
+      this.service.listen(port)
       this.service.on('request', this.onRequest.bind(this))
     }
 
