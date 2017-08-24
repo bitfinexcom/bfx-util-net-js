@@ -3,8 +3,8 @@
 const _ = require('lodash')
 const async = require('async')
 const GrLink = require('grenache-nodejs-link')
-const GrBase = require('grenache-nodejs-base')
 const GrHttp = require('grenache-nodejs-http')
+const GrWs = require('grenache-nodejs-ws')
 const Facility = require('./base/base')
 
 class GrcFacility extends Facility {
@@ -117,7 +117,8 @@ class GrcFacility extends Facility {
           })
         }, next)
       }
-    }, err => {
+    }, (err) => {
+      if (err) console.error(err)
       this._ticking = null
     })
   }
