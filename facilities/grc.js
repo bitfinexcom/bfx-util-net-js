@@ -4,6 +4,7 @@ const _ = require('lodash')
 const async = require('async')
 const GrLink = require('grenache-nodejs-link')
 const GrHttp = require('grenache-nodejs-http')
+const GrWs = require('grenache-nodejs-ws-tls')
 const Facility = require('./base/base')
 
 class GrcFacility extends Facility {
@@ -54,6 +55,12 @@ class GrcFacility extends Facility {
             this.peer_srv = new GrHttp.PeerRPCServer(this.link, {
               timeout: this.opts.server_timeout || 600000
             })
+            break
+          case 'ws':
+            this.peer = new GrWs.PeerRPCClient(this.link, {
+              maxActiveKeyDests: this.opts.maxActiveKeyDests
+            })
+            this.peer_srv = new GrWs.PeerRPCServer(this.link, {})
             break
         }
 
