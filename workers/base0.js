@@ -36,7 +36,7 @@ class Base0 {
 
   facility (type, name, ns, opts) {
     let Fmod = null
-    let rdir = 'facilitifes'
+    let rdir = 'facilities'
 
     try {
       Fmod = require(`${__dirname}/../${rdir}/${name}.js`)
