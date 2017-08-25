@@ -36,16 +36,7 @@ class Base0 {
 
   facility (type, name, ns, opts) {
     let Fmod = null
-    let rdir = null
-
-    switch (type) {
-      case 'plg':
-        rdir = 'plugins'
-        break
-      default:
-        rdir = 'facilities'
-        break
-    }
+    let rdir = 'facilitifes'
 
     try {
       Fmod = require(`${__dirname}/../${rdir}/${name}.js`)
