@@ -98,7 +98,6 @@ class Base0 {
 
   saveStatus () {
     try {
-      console.log('saving status', this.status)
       fs.writeFile(`${__dirname}/../status/${this.prefix}.json`, JSON.stringify(this.status), () => {})
     } catch (e) {
       console.error(e)
