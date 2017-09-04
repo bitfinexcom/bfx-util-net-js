@@ -25,7 +25,7 @@ class GrcFacility extends Facility {
     if (this.api) {
       const api = this.api
       api.handle(service, payload, (err, res) => {
-        handler.reply(err, res)
+        handler.reply(_.isError(err) ? err.toString() : err, res)
       })
     } else {
       this.emit('request', rid, service, payload, handler)
