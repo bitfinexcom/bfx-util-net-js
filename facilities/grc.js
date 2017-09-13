@@ -25,7 +25,7 @@ class GrcFacility extends Facility {
     if (this.api) {
       const api = this.api
       api.handle(service, payload, (err, res) => {
-        handler.reply(_.isError(err) ? err.toString() : err, res)
+        handler.reply(_.isString(err) ? new Error(err) : err, res)
       })
     } else {
       this.emit('request', rid, service, payload, handler)
@@ -173,6 +173,10 @@ class GrcFacility extends Facility {
     let isExecuted = false
 
     const cb = (err, res) => {
+      if (err) {
+        console.error(service, action, args, err)
+      }
+  
       if (isExecuted) {
         console.error('ERR_DOUBLE_CB', service, action, JSON.stringify(args))
         return
