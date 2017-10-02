@@ -11,20 +11,16 @@
     "bitfinex"
   ],
   "dependencies": {
-    "async": "~2.5.0",
+    "async": "^2.5.0",
     "grenache-nodejs-link": "^0.5.0",
     "grenache-nodejs-base": "^0.5.0",
     "grenache-nodejs-http": "^0.5.0",
     "grenache-nodejs-ws-tls": "^0.5.0",
-    "lodash": "~4.17.4",
+    "lodash": "^4.17.4",
     "yargs": "^6.3.0"
   },
   "engine": {
-    "node": ">=6.0"
-  },
-  "main": "index.js",
-  "scripts": {
-    "test": "standard"
+    "node": ">=8.0"
   },
   "license": "MIT",
   "repository": {
