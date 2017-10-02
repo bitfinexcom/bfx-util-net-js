@@ -1,3 +1,6 @@
 [submodule "facilities/base"]
 	path = facilities/base
 	url = https://github.com/bitfinexcom/bfx-facs-base.git
+[submodule "workers/base"]
+	path = workers/base
+	url = https://github.com/bitfinexcom/bfx-wrk-base.git

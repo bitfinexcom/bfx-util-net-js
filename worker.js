@@ -33,6 +33,7 @@ const conf = _.merge(
 
 const wref = wtype.split('-').reverse()
 const ctx = {
+  root: __dirname,
   wtype: wtype,
   env: env
 }
