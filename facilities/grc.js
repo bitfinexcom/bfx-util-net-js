@@ -5,9 +5,9 @@ const async = require('async')
 const GrLink = require('grenache-nodejs-link')
 const GrHttp = require('grenache-nodejs-http')
 const GrWs = require('grenache-nodejs-ws-tls')
-const Facility = require('./base/base')
+const Base = require('bfx-facs-base')
 
-class GrcFacility extends Facility {
+class GrcFacility extends Base {
   constructor (caller, opts, ctx) {
     super(caller, opts, ctx)
 

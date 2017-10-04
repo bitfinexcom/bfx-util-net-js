@@ -2,9 +2,9 @@
 
 const _ = require('lodash')
 const async = require('async')
-const Facility = require('./base/base')
+const Base = require('bfx-facs-base')
 
-class Intervals extends Facility {
+class Intervals extends Base {
   constructor (caller, opts, ctx) {
     super(caller, opts, ctx)
 
