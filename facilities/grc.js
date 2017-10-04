@@ -176,7 +176,7 @@ class GrcFacility extends Facility {
       if (err) {
         console.error(service, action, args, err)
       }
-  
+
       if (isExecuted) {
         console.error('ERR_DOUBLE_CB', service, action, JSON.stringify(args))
         return
