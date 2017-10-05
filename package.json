@@ -14,10 +14,6 @@
     "async": "^2.5.0",
     "bfx-facs-base": "git+https://github.com/bitfinexcom/bfx-facs-base.git",
     "bfx-wrk-base": "git+https://github.com/bitfinexcom/bfx-wrk-base.git",
-    "grenache-nodejs-link": "^0.5.0",
-    "grenache-nodejs-base": "^0.5.0",
-    "grenache-nodejs-http": "^0.5.0",
-    "grenache-nodejs-ws-tls": "^0.5.0",
     "lodash": "^4.17.4",
     "yargs": "^6.3.0"
   },
