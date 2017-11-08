@@ -17,13 +17,6 @@ class WrkUtilNetApi extends WrkApi {
     this.start()
   }
 
-  getGrcConf () {
-    const grcConf = super.getGrcConf()
-    grcConf.services = ['rest:util:net']
-
-    return grcConf
-  }
-
   getApiConf () {
     return {
       path: 'net.util'
