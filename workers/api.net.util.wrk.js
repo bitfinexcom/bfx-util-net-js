@@ -24,8 +24,6 @@ class WrkUtilNetApi extends WrkApi {
   }
 
   getPluginCtx (type) {
-    super.init()
-
     const ctx = super.getPluginCtx(type)
 
     switch (type) {
