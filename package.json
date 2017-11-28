@@ -27,6 +27,8 @@
   },
   "devDependencies": {
     "grenache-grape": "^0.5.2",
+    "grenache-nodejs-http": "^0.7.1",
+    "grenache-nodejs-link": "^0.7.3",
     "mocha": "^3.4.2",
     "standard": "^10.0.3"
   },

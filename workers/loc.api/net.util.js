@@ -14,8 +14,6 @@ class UtilNet extends Api {
   }
 
   getIpInfo (space, ip, cb) {
-    if (!_.isFunction(cb)) return cb(new Error('ERR_API_CB_INVALID'))
-
     const geoData = geoIp.lookup(ip)
     const asnData = this.ctx.asn_db.get(ip)
 
@@ -32,23 +30,17 @@ class UtilNet extends Api {
   }
 
   getIpGeo (space, ip, cb) {
-    if (!_.isFunction(cb)) return cb(new Error('ERR_API_CB_INVALID'))
-
     const res = geoIp.lookup(ip)
     cb(null, [ ip, res ])
   }
 
   getIpAsn (space, ip, cb) {
-    if (!_.isFunction(cb)) return cb(new Error('ERR_API_CB_INVALID'))
-
     const res = this.ctx.asn_db.get(ip)
 
     cb(null, [ ip, res ])
   }
 
   getIpGeoBatch (space, ips, cb) {
-    if (!_.isFunction(cb)) return cb(new Error('ERR_API_CB_INVALID'))
-
     if (!_.isArray(ips)) {
       return cb(new Error('ERR_API_INPUT_INVALID'))
     }
@@ -61,8 +53,6 @@ class UtilNet extends Api {
   }
 
   getReverseDns (space, ip, cb) {
-    if (!_.isFunction(cb)) return cb(new Error('ERR_API_CB_INVALID'))
-
     dns.reverse(ip, (err, data) => {
       if (err) return cb(err)
 
