@@ -12,7 +12,7 @@
     "update-asn-data": "./update-asn-db.sh"
   },
   "dependencies": {
-    "async": "^2.5.0",
+    "async": "^2.6.0",
     "bfx-facs-api": "git+https://github.com/bitfinexcom/bfx-facs-api.git",
     "bfx-facs-base": "git+https://github.com/bitfinexcom/bfx-facs-base.git",
     "bfx-facs-grc": "git+https://github.com/bitfinexcom/bfx-facs-grc.git",
@@ -38,12 +38,16 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bitfinexcom/bfx-svc-js.git"
+    "url": "git+https://github.com/bitfinexcom/bfx-util-net-js.git"
   },
   "maintainers": [
     {
       "name": "prdn",
       "email": "paolo@bitfinex.com"
     }
-  ]
+  ],
+  "devDependencies": {
+    "mocha": "^3.4.2",
+    "standard": "^10.0.3"
+  }
 }
