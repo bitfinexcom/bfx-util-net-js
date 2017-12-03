@@ -20,9 +20,9 @@ There is a small CLI to help with service setup: https://github.com/bitfinexcom/
 
 ### Repositories
 
-All new repositories should inheritate from the closest parent: `bfx-coin-eth-js` inherits from `bfx-coin-js`; `bfx-coin-js` inheritates from `bfx-svc-js` (the root service repository)
+All new repositories should inheritate from the closest parent: `bfx-util-net-js` inherits from `bfx-util-js`; `bfx-util-js` inheritates from `bfx-svc-js` (the root service repository)
 
 ### Namespace hierarchy
 
-* File names: parent is rightmost (i.e `eth.api.coin.wrk.js` : wrk>coin>api>eth)
-* Class names: parent is leftmost (i.e `WkrCoinApiEth`)
+* File names: parent is rightmost (i.e `api.net.util.wrk.js` : wrk>util>net>api)
+* Class names: parent is leftmost (i.e `WkrUtilNetApi`)
