@@ -26,7 +26,7 @@
     "yargs": "^6.3.0"
   },
   "devDependencies": {
-    "grenache-grape": "^0.5.2",
+    "grenache-grape": "^0.7.4",
     "grenache-nodejs-http": "^0.7.1",
     "grenache-nodejs-link": "^0.7.3",
     "mocha": "^3.4.2",
