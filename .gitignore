@@ -6,8 +6,5 @@ config/*.json
 !config/facs/*.json.example
 config/facs/*.json
 logs
-<<<<<<< HEAD
 
 mmdb/*
-=======
->>>>>>> upstream/master
