@@ -192,7 +192,10 @@ describe('RPC integration', () => {
 
       const [ ip, asnData ] = data
       assert.equal(ip, '8.8.8.8')
-      assert.equal(asnData.autonomous_system_organization, 'Google Inc.')
+      assert.ok(
+        /Google/.test(asnData.autonomous_system_organization),
+        'owned by google'
+      )
 
       done()
     })
