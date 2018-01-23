@@ -3,3 +3,8 @@ sudo: false
 language: node_js
 node_js:
   - "stable"
+
+before_script:
+  - cp config/common.json.example config/common.json
+  - cp config/facs/grc.config.json.example config/facs/grc.config.json
+  - cp config/net.util.json.example config/net.util.json
