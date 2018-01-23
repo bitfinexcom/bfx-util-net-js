@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/bitfinexcom/bfx-util-net-js.svg?branch=master)](https://travis-ci.org/bitfinexcom/bfx-util-net-js)
+
 # bfx-util-net
 
 ## Setup
@@ -6,11 +8,25 @@ The project inherits code from a base repository.
 
 The base / root project is: https://github.com/bitfinexcom/bfx-util-js
 
-Setup steps:
+## Setup
 
-1. Add base as upstream: `git remote add upstream https://github.com/bitfinexcom/bfx-util-js`
+### Set upstream
+
+```
+git remote add upstream https://github.com/bitfinexcom/bfx-util-js
+```
 
 Changes should go through the base project and merged from upstream, if applicable.
+
+### Configuration
+
+```
+cp config/common.json.example config/common.json
+cp config/facs/grc.config.json.example config/facs/grc.config.json
+cp config/net.util.json.example config/net.util.json
+```
+
+### Grapes
 
 Run two Grapes:
 
