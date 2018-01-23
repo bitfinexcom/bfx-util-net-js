@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/bitfinexcom/bfx-util-net-js.svg?branch=master)](https://travis-ci.org/bitfinexcom/bfx-util-net-js)
+
 # bfx-util-net
 
 ## Setup
