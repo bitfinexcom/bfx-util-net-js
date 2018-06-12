@@ -21,7 +21,7 @@
     "bfx-wrk-api": "git+https://github.com/bitfinexcom/bfx-wrk-api.git",
     "bfx-wrk-base": "git+https://github.com/bitfinexcom/bfx-wrk-base.git",
     "geoip-lite": "^1.2.1",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.10",
     "maxmind": "^2.2.0",
     "yargs": "^6.3.0"
   },
@@ -29,13 +29,13 @@
     "grenache-grape": "^0.8.0",
     "grenache-nodejs-http": "^0.7.1",
     "grenache-nodejs-link": "^0.7.3",
-    "mocha": "^3.4.2",
-    "standard": "^10.0.3"
+    "mocha": "^5.2.0",
+    "standard": "^11.0.1"
   },
   "engine": {
     "node": ">=8.0"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bitfinexcom/bfx-util-net-js.git"
