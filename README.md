@@ -64,6 +64,20 @@ the updated data into the RAM as soon as the data changes.
 node worker.js --env=development --wtype=wrk-util-net-api --apiPort 8721
 ```
 
+### SSL / ACL
+
+To turn on ACL and SSL set up, copy `sec-test` to `sec`:
+
+```
+cp -R sec-test sec
+```
+
+Set access rules in [sec/acl.json](https://github.com/bitfinexcom/bfx-util-net-js/blob/8d07c144f3a4135db0d4c7bc51297ffc06e358f9/sec-test/acl.json)
+
+Access is logged to [sec/acl.log](https://github.com/bitfinexcom/bfx-util-net-js/blob/8d07c144f3a4135db0d4c7bc51297ffc06e358f9/sec-test/acl.log).
+
+To use SSL in `example.js`, uncomment everything related to SSL: https://github.com/bitfinexcom/bfx-util-net-js/blob/8d07c144f3a4135db0d4c7bc51297ffc06e358f9/example.js#L16.L24
+
 ## Grenache API
 
 ### action: 'getIpInfo'
