@@ -11,12 +11,14 @@ link.start()
 const peer = new Peer(link, {})
 peer.init()
 
+const serviceName = 'rest:util:net'
+
 const geoQuery = {
   action: 'getIpGeo',
-  'args': [ '8.8.8.8' ]
+  args: [ '8.8.8.8' ]
 }
 
-peer.request('rest:util:net', geoQuery, { timeout: 10000 }, (err, data) => {
+peer.request(serviceName, geoQuery, { timeout: 10000 }, (err, data) => {
   if (err) {
     console.error(err)
     process.exit(1)
@@ -29,10 +31,10 @@ peer.request('rest:util:net', geoQuery, { timeout: 10000 }, (err, data) => {
 
 const asnQuery = {
   action: 'getIpAsn',
-  'args': [ '8.8.8.8' ]
+  args: [ '8.8.8.8' ]
 }
 
-peer.request('rest:util:net', asnQuery, { timeout: 10000 }, (err, data) => {
+peer.request(serviceName, asnQuery, { timeout: 10000 }, (err, data) => {
   if (err) {
     console.error(err)
     process.exit(1)
@@ -45,9 +47,9 @@ peer.request('rest:util:net', asnQuery, { timeout: 10000 }, (err, data) => {
 
 const generalQuery = {
   action: 'getIpInfo',
-  'args': [ '8.8.8.8' ]
+  args: [ '8.8.8.8' ]
 }
-peer.request('rest:util:net', generalQuery, { timeout: 10000 }, (err, data) => {
+peer.request(serviceName, generalQuery, { timeout: 10000 }, (err, data) => {
   if (err) {
     console.error(err)
     process.exit(1)
