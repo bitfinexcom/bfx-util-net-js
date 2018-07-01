@@ -67,6 +67,9 @@ describe('RPC integration', () => {
 
       const res = data[1]
       assert.equal(res.country, 'DE')
+
+      peer.stop()
+      link.stop()
       done()
     })
   }).timeout(7000)
@@ -87,6 +90,9 @@ describe('RPC integration', () => {
 
     peer.request('rest:util:net', query, { timeout: 10000 }, (err, data) => {
       assert.ok(err)
+
+      peer.stop()
+      link.stop()
       done()
     })
   }).timeout(7000)
@@ -117,6 +123,9 @@ describe('RPC integration', () => {
 
       assert.equal(data[0][1].country, 'DE')
       assert.equal(data[1][1].country, 'DE')
+
+      peer.stop()
+      link.stop()
       done()
     })
   }).timeout(7000)
@@ -143,6 +152,8 @@ describe('RPC integration', () => {
         data[1][0], 'google-public-dns-a.google.com'
       )
 
+      peer.stop()
+      link.stop()
       done()
     })
   }).timeout(7000)
@@ -169,6 +180,8 @@ describe('RPC integration', () => {
       assert.ok(data[1].dns)
       assert.ok(data[1].asn)
 
+      peer.stop()
+      link.stop()
       done()
     })
   }).timeout(7000)
@@ -197,6 +210,8 @@ describe('RPC integration', () => {
         'owned by google'
       )
 
+      peer.stop()
+      link.stop()
       done()
     })
   }).timeout(7000)
