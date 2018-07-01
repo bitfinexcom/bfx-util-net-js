@@ -28,7 +28,7 @@ if (secure) {
   opts.secure = secure
 }
 
-const peer = new Peer(link, )
+const peer = new Peer(link, opts)
 peer.init()
 
 const geoQuery = {
