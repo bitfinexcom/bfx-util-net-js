@@ -1,5 +1,7 @@
 const Grenache = require('grenache-nodejs-http')
 const Link = require('grenache-nodejs-link')
+const fs = require('fs')
+const path = require('path')
 
 const Peer = Grenache.PeerRPCClient
 
@@ -8,10 +10,26 @@ const link = new Link({
 })
 link.start()
 
-const peer = new Peer(link, {})
-peer.init()
-
+let secure = false
 const serviceName = 'rest:util:net'
+
+// ssl / fingerprint
+// const serviceName = 'sec:rest:util:net'
+// secure = {
+//   key: fs.readFileSync(path.join(__dirname, 'sec', 'client-key.pem')),
+//   cert: fs.readFileSync(path.join(__dirname, 'sec', 'client-crt.pem')),
+//   ca: fs.readFileSync(path.join(__dirname, 'sec', 'ca-crt.pem')),
+//   rejectUnauthorized: false // take care, can be dangerous in production!
+// }
+//
+
+let opts = {}
+if (secure) {
+  opts.secure = secure
+}
+
+const peer = new Peer(link, )
+peer.init()
 
 const geoQuery = {
   action: 'getIpGeo',
