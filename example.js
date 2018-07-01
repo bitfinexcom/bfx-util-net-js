@@ -1,7 +1,5 @@
 const Grenache = require('grenache-nodejs-http')
 const Link = require('grenache-nodejs-link')
-const fs = require('fs')
-const path = require('path')
 
 const Peer = Grenache.PeerRPCClient
 
@@ -14,6 +12,8 @@ let secure = false
 const serviceName = 'rest:util:net'
 
 // ssl / fingerprint
+// const fs = require('fs')
+// const path = require('path')
 // const serviceName = 'sec:rest:util:net'
 // secure = {
 //   key: fs.readFileSync(path.join(__dirname, 'sec', 'client-key.pem')),
