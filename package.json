@@ -26,9 +26,6 @@
     "yargs": "^6.3.0"
   },
   "devDependencies": {
-    "grenache-grape": "^0.8.0",
-    "grenache-nodejs-http": "^0.7.1",
-    "grenache-nodejs-link": "^0.7.3",
     "mocha": "^5.2.0",
     "standard": "^11.0.1"
   },
@@ -45,9 +42,5 @@
       "name": "prdn",
       "email": "paolo@bitfinex.com"
     }
-  ],
-  "devDependencies": {
-    "mocha": "^5.2.0",
-    "standard": "^11.0.1"
-  }
+  ]
 }
