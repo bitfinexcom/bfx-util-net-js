@@ -8,5 +8,5 @@ config/facs/*.json
 logs
 
 mmdb/*
-certs
+sec
 package-lock.json
