@@ -17,12 +17,6 @@ class WrkUtilNetApi extends WrkApi {
     this.start()
   }
 
-  getApiConf () {
-    return {
-      path: 'net.util'
-    }
-  }
-
   getPluginCtx (type) {
     const ctx = super.getPluginCtx(type)
 
