@@ -11,13 +11,13 @@
     "bitfinex"
   ],
   "dependencies": {
-    "async": "^2.6.0",
+    "async": "^2.6.1",
     "bfx-facs-base": "git+https://github.com/bitfinexcom/bfx-facs-base.git",
     "bfx-facs-interval": "https://github.com/bitfinexcom/bfx-facs-interval.git",
     "bfx-svc-boot-js": "https://github.com/bitfinexcom/bfx-svc-boot-js.git",
     "bfx-wrk-base": "git+https://github.com/bitfinexcom/bfx-wrk-base.git",
     "lodash": "^4.17.10",
-    "yargs": "^6.3.0"
+    "yargs": "^12.0.2"
   },
   "engine": {
     "node": ">=8.0"
@@ -35,6 +35,6 @@
   ],
   "devDependencies": {
     "mocha": "^5.2.0",
-    "standard": "^11.0.1"
+    "standard": "^12.0.1"
   }
 }
