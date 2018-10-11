@@ -61,12 +61,12 @@ describe('RPC integration', () => {
     peer.request('rest:util:net', query, { timeout: 10000 }, (err, data) => {
       if (err) throw err
 
-      assert.equal(
+      assert.strictEqual(
         data[0], '53.1.34.21', 'result contains queried ip'
       )
 
       const res = data[1]
-      assert.equal(res.country, 'DE')
+      assert.strictEqual(res.country, 'DE')
 
       peer.stop()
       link.stop()
@@ -114,15 +114,15 @@ describe('RPC integration', () => {
 
     peer.request('rest:util:net', query, { timeout: 10000 }, (err, data) => {
       if (err) throw err
-      assert.equal(
+      assert.strictEqual(
         data[0][0], '53.1.34.21', 'result contains queried ip'
       )
-      assert.equal(
+      assert.strictEqual(
         data[1][0], '53.2.34.21', 'result contains queried ip'
       )
 
-      assert.equal(data[0][1].country, 'DE')
-      assert.equal(data[1][1].country, 'DE')
+      assert.strictEqual(data[0][1].country, 'DE')
+      assert.strictEqual(data[1][1].country, 'DE')
 
       peer.stop()
       link.stop()
@@ -147,8 +147,8 @@ describe('RPC integration', () => {
     peer.request('rest:util:net', query, { timeout: 10000 }, (err, data) => {
       if (err) throw err
 
-      assert.equal(data[0], '8.8.8.8')
-      assert.equal(
+      assert.strictEqual(data[0], '8.8.8.8')
+      assert.strictEqual(
         data[1][0], 'google-public-dns-a.google.com'
       )
 
@@ -175,7 +175,7 @@ describe('RPC integration', () => {
     peer.request('rest:util:net', query, { timeout: 10000 }, (err, data) => {
       if (err) throw err
 
-      assert.equal(data[0], '8.8.8.8')
+      assert.strictEqual(data[0], '8.8.8.8')
       assert.ok(data[1].geo)
       assert.ok(data[1].dns)
       assert.ok(data[1].asn)
@@ -204,7 +204,7 @@ describe('RPC integration', () => {
       if (err) throw err
 
       const [ ip, asnData ] = data
-      assert.equal(ip, '8.8.8.8')
+      assert.strictEqual(ip, '8.8.8.8')
       assert.ok(
         /Google/.test(asnData.autonomous_system_organization),
         'owned by google'
