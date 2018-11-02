@@ -2,8 +2,6 @@
 
 const _ = require('lodash')
 const dns = require('dns')
-const geoIp = require('geoip-lite')
-geoIp.startWatchingDataUpdate()
 
 const { Api } = require('bfx-wrk-api')
 
@@ -14,7 +12,7 @@ class UtilNet extends Api {
   }
 
   getIpInfo (space, ip, cb) {
-    const geoData = geoIp.lookup(ip)
+    const geoData = this.ctx.geoIp.lookup(ip)
     const asnData = this.ctx.asn_db.get(ip)
 
     dns.reverse(ip, (err, dnsData) => {
@@ -30,7 +28,7 @@ class UtilNet extends Api {
   }
 
   getIpGeo (space, ip, cb) {
-    const res = geoIp.lookup(ip)
+    const res = this.ctx.geoIp.lookup(ip)
     cb(null, [ ip, res ])
   }
 
@@ -46,7 +44,7 @@ class UtilNet extends Api {
     }
 
     const res = ips.map((ip) => {
-      return [ ip, geoIp.lookup(ip) ]
+      return [ ip, this.ctx.geoIp.lookup(ip) ]
     })
 
     cb(null, res)
