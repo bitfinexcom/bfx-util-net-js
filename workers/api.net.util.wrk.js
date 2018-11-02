@@ -2,6 +2,7 @@
 
 const { WrkApi } = require('bfx-wrk-api')
 const maxmind = require('maxmind')
+const geoIp = require('geoip-lite')
 const path = require('path')
 const fs = require('fs')
 
@@ -17,18 +18,13 @@ class WrkUtilNetApi extends WrkApi {
     this.start()
   }
 
-  getApiConf () {
-    return {
-      path: 'net.util'
-    }
-  }
-
   getPluginCtx (type) {
     const ctx = super.getPluginCtx(type)
 
     switch (type) {
       case 'api_bfx':
         ctx.asn_db = this.asnDb
+        ctx.geoIp = this.geoIp
         break
     }
 
@@ -38,8 +34,20 @@ class WrkUtilNetApi extends WrkApi {
   init () {
     super.init()
 
+    this.geoIp = geoIp
     this.testIfDbExists()
-    this.asnDb = maxmind.openSync(newDb, { watchForUpdates: true })
+    this.asnDb = maxmind.openSync(newDb, {
+      watchForUpdates: true,
+      watchForUpdatesNonPersistent: true
+    })
+
+    geoIp.startWatchingDataUpdate()
+  }
+
+  stop () {
+    super.stop()
+
+    this.geoIp.stopWatchingDataUpdate()
   }
 
   testIfDbExists () {
