@@ -3,62 +3,47 @@
 'use strict'
 
 const assert = require('assert')
-const spawn = require('child_process').spawn
 const path = require('path')
 
-const Grenache = require('grenache-nodejs-http')
-const Link = require('grenache-nodejs-link')
-const Peer = Grenache.PeerRPCClient
+const createGrapes = require('bfx-svc-test-helper/grapes')
+const createWorker = require('bfx-svc-test-helper/worker')
+const createClient = require('bfx-svc-test-helper/client')
 
-const { bootTwoGrapes, killGrapes } = require('./helper')
-
-let rpc, grapes
+let grapes, worker, client
 describe('RPC integration', () => {
-  before(function (done) {
+  before(async function () {
     this.timeout(20000)
 
-    bootTwoGrapes((err, g) => {
-      if (err) throw err
+    grapes = createGrapes()
+    await grapes.start()
 
-      grapes = g
-      grapes[0].once('announce', (msg) => {
-        done()
-      })
+    worker = createWorker({
+      env: 'development',
+      wtype: 'wrk-util-net-api',
+      apiPort: 8721,
+      serviceRoot: path.join(__dirname, '..')
+    }, grapes)
 
-      const f = path.join(__dirname, '..', 'worker.js')
-      rpc = spawn('node', [ f, '--env=development', '--wtype=wrk-util-net-api', '--apiPort=8721' ])
-      rpc.stdout.on('data', (d) => {
-        console.log(d.toString())
-      })
-      rpc.stderr.on('data', (d) => {
-        console.log(d.toString())
-      })
-    })
+    await worker.start()
+
+    client = createClient(worker)
   })
 
-  after(function (done) {
+  after(async function () {
     this.timeout(5000)
-    rpc.on('close', () => {
-      killGrapes(grapes, done)
-    })
-    rpc.kill()
+
+    await client.stop()
+    await worker.stop()
+    await grapes.stop()
   })
 
   it('geo-ip: retrieves ips', (done) => {
-    const link = new Link({
-      grape: 'http://127.0.0.1:30001'
-    })
-    link.start()
-
-    const peer = new Peer(link, {})
-    peer.init()
-
     const query = {
       action: 'getIpGeo',
       'args': [ '53.1.34.21' ]
     }
 
-    peer.request('rest:util:net', query, { timeout: 10000 }, (err, data) => {
+    client.request(query, (err, data) => {
       if (err) throw err
 
       assert.strictEqual(
@@ -67,52 +52,18 @@ describe('RPC integration', () => {
 
       const res = data[1]
       assert.strictEqual(res.country, 'DE')
-
-      peer.stop()
-      link.stop()
-      done()
-    })
-  }).timeout(7000)
-
-  it('geo-ip: errors if no ip given', (done) => {
-    const link = new Link({
-      grape: 'http://127.0.0.1:30001'
-    })
-    link.start()
-
-    const peer = new Peer(link, {})
-    peer.init()
-
-    const query = {
-      action: 'getIpGeo',
-      'args': []
-    }
-
-    peer.request('rest:util:net', query, { timeout: 10000 }, (err, data) => {
-      assert.ok(err)
-
-      peer.stop()
-      link.stop()
       done()
     })
   }).timeout(7000)
 
   it('geo-ip: supports batch lookups', (done) => {
-    const link = new Link({
-      grape: 'http://127.0.0.1:30001'
-    })
-    link.start()
-
-    const peer = new Peer(link, {})
-    peer.init()
-
     const batch = ['53.1.34.21', '53.2.34.21']
     const query = {
       action: 'getIpGeoBatch',
       'args': [ batch ]
     }
 
-    peer.request('rest:util:net', query, { timeout: 10000 }, (err, data) => {
+    client.request(query, (err, data) => {
       if (err) throw err
       assert.strictEqual(
         data[0][0], '53.1.34.21', 'result contains queried ip'
@@ -124,27 +75,17 @@ describe('RPC integration', () => {
       assert.strictEqual(data[0][1].country, 'DE')
       assert.strictEqual(data[1][1].country, 'DE')
 
-      peer.stop()
-      link.stop()
       done()
     })
   }).timeout(7000)
 
   it('reverse dns: retrieves ips (external)', (done) => {
-    const link = new Link({
-      grape: 'http://127.0.0.1:30001'
-    })
-    link.start()
-
-    const peer = new Peer(link, {})
-    peer.init()
-
     const query = {
       action: 'getReverseDns',
       'args': [ '8.8.8.8' ]
     }
 
-    peer.request('rest:util:net', query, { timeout: 10000 }, (err, data) => {
+    client.request(query, (err, data) => {
       if (err) throw err
 
       assert.strictEqual(data[0], '8.8.8.8')
@@ -152,27 +93,17 @@ describe('RPC integration', () => {
         data[1][0], 'google-public-dns-a.google.com'
       )
 
-      peer.stop()
-      link.stop()
       done()
     })
   }).timeout(7000)
 
   it('getIpInfo: all ip info endpoint (external)', (done) => {
-    const link = new Link({
-      grape: 'http://127.0.0.1:30001'
-    })
-    link.start()
-
-    const peer = new Peer(link, {})
-    peer.init()
-
     const query = {
       action: 'getIpInfo',
       'args': [ '8.8.8.8' ]
     }
 
-    peer.request('rest:util:net', query, { timeout: 10000 }, (err, data) => {
+    client.request(query, (err, data) => {
       if (err) throw err
 
       assert.strictEqual(data[0], '8.8.8.8')
@@ -180,27 +111,17 @@ describe('RPC integration', () => {
       assert.ok(data[1].dns)
       assert.ok(data[1].asn)
 
-      peer.stop()
-      link.stop()
       done()
     })
   }).timeout(7000)
 
   it('getIpAsn: retrieves asn info', (done) => {
-    const link = new Link({
-      grape: 'http://127.0.0.1:30001'
-    })
-    link.start()
-
-    const peer = new Peer(link, {})
-    peer.init()
-
     const query = {
       action: 'getIpAsn',
       'args': [ '8.8.8.8' ]
     }
 
-    peer.request('rest:util:net', query, { timeout: 10000 }, (err, data) => {
+    client.request(query, (err, data) => {
       if (err) throw err
 
       const [ ip, asnData ] = data
@@ -210,8 +131,6 @@ describe('RPC integration', () => {
         'owned by google'
       )
 
-      peer.stop()
-      link.stop()
       done()
     })
   }).timeout(7000)
