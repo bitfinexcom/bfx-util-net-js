@@ -44,10 +44,11 @@ class WrkUtilNetApi extends WrkApi {
     geoIp.startWatchingDataUpdate()
   }
 
-  stop () {
-    super.stop()
-
-    this.geoIp.stopWatchingDataUpdate()
+  stop (cb = () => {}) {
+    super.stop(() => {
+      this.geoIp.stopWatchingDataUpdate()
+      cb(null)
+    })
   }
 
   testIfDbExists () {
