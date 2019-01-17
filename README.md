@@ -21,9 +21,7 @@ Changes should go through the base project and merged from upstream, if applicab
 ### Configuration
 
 ```
-cp config/common.json.example config/common.json
-cp config/facs/grc.config.json.example config/facs/grc.config.json
-cp config/net.util.json.example config/net.util.json
+bash setup-config.sh
 ```
 
 ### Grapes
