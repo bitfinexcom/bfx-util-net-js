@@ -21,9 +21,9 @@
     "bfx-svc-test-helper": "https://github.com/bitfinexcom/bfx-svc-test-helper.git",
     "bfx-wrk-api": "git+https://github.com/bitfinexcom/bfx-wrk-api.git",
     "bfx-wrk-base": "git+https://github.com/bitfinexcom/bfx-wrk-base.git",
-    "geoip-lite": "^1.2.1",
-    "lodash": "^4.17.10",
-    "maxmind": "^2.2.0",
+    "geoip-lite": "^1.3.7",
+    "lodash": "^4.17.11",
+    "maxmind": "^2.12.0",
     "yargs": "^12.0.2"
   },
   "devDependencies": {
