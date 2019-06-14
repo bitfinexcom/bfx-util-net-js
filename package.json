@@ -17,7 +17,7 @@
     "bfx-facs-base": "git+https://github.com/bitfinexcom/bfx-facs-base.git",
     "bfx-facs-grc": "git+https://github.com/bitfinexcom/bfx-facs-grc.git",
     "bfx-facs-interval": "https://github.com/bitfinexcom/bfx-facs-interval.git",
-    "bfx-facs-redis": "git+https://github.com/bitfinexcom/bfx-facs-redis.git",
+    "bfx-facs-lru": "git+https://github.com/bitfinexcom/bfx-facs-lru.git",
     "bfx-svc-boot-js": "https://github.com/bitfinexcom/bfx-svc-boot-js.git",
     "bfx-svc-test-helper": "https://github.com/bitfinexcom/bfx-svc-test-helper.git",
     "bfx-wrk-api": "git+https://github.com/bitfinexcom/bfx-wrk-api.git",

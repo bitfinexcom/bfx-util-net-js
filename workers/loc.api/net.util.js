@@ -29,26 +29,17 @@ class UtilNet extends Api {
 
   getIpInfoCached (space, ip, cb) {
     const key = `getIpInfo:${ip}`
+    const res = this.ctx.lru_0.get(key)
 
-    this.ctx.redis_gc0.cli_rw.get(key, (err, res) => {
+    if (res) return cb(null, res)
+
+    this.getIpInfo(space, ip, (err, ipInfo) => {
       if (err) return cb(err)
 
-      if (res) return cb(null, JSON.parse(res))
+      if (!ipInfo) return cb(null, null)
 
-      this.getIpInfo(space, ip, (err, ipInfo) => {
-        if (err) return cb(err)
-
-        if (!ipInfo) return cb(null, null)
-
-        this.ctx.redis_gc0.cli_rw.multi([
-          ['set', key, JSON.stringify(ipInfo)],
-          ['expire', key, 86400 * 30]
-        ]).exec((err, res) => {
-          if (err) return cb(err)
-
-          cb(null, ipInfo)
-        })
-      })
+      this.ctx.lru_0.set(key, ipInfo)
+      cb(null, ipInfo)
     })
   }
 

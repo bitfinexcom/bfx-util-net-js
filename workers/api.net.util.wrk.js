@@ -23,7 +23,7 @@ class WrkUtilNetApi extends WrkApi {
 
     switch (type) {
       case 'api_bfx':
-        ctx.redis_gc0 = this.redis_gc0
+        ctx.lru_0 = this.lru_0
         ctx.asn_db = this.asnDb
         ctx.geoIp = this.geoIp
         break
@@ -36,7 +36,7 @@ class WrkUtilNetApi extends WrkApi {
     super.init()
 
     this.setInitFacs([
-      ['fac', 'bfx-facs-redis', 'gc0', 'gc0', {}]
+      ['fac', 'bfx-facs-lru', '0', '0', { maxAge: 86400 * 30 * 1000 }]
     ])
 
     this.geoIp = geoIp
