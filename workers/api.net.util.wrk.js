@@ -23,6 +23,7 @@ class WrkUtilNetApi extends WrkApi {
 
     switch (type) {
       case 'api_bfx':
+        ctx.redis_gc0 = this.redis_gc0
         ctx.asn_db = this.asnDb
         ctx.geoIp = this.geoIp
         break
@@ -33,6 +34,10 @@ class WrkUtilNetApi extends WrkApi {
 
   init () {
     super.init()
+
+    this.setInitFacs([
+      ['fac', 'bfx-facs-redis', 'gc0', 'gc0', {}]
+    ])
 
     this.geoIp = geoIp
     this.testIfDbExists()

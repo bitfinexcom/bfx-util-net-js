@@ -27,6 +27,31 @@ class UtilNet extends Api {
     })
   }
 
+  getIpInfoCached (space, ip, cb) {
+    const key = `getIpInfo:${ip}`
+
+    this.ctx.redis_gc0.cli_rw.get(key, (err, res) => {
+      if (err) return cb(err)
+
+      if (res) return cb(null, JSON.parse(res))
+
+      this.getIpInfo(space, ip, (err, ipInfo) => {
+        if (err) return cb(err)
+
+        if (!ipInfo) return cb(null, null)
+
+        this.ctx.redis_gc0.cli_rw.multi([
+          ['set', key, JSON.stringify(ipInfo)],
+          ['expire', key, 86400 * 30]
+        ]).exec((err, res) => {
+          if (err) return cb(err)
+
+          cb(null, ipInfo)
+        })
+      })
+    })
+  }
+
   getIpGeo (space, ip, cb) {
     const res = this.ctx.geoIp.lookup(ip)
     cb(null, [ ip, res ])

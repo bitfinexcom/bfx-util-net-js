@@ -115,6 +115,24 @@ describe('RPC integration', () => {
     })
   }).timeout(7000)
 
+  it('getIpInfoCached: all ip info endpoint (external)', (done) => {
+    const query = {
+      action: 'getIpInfoCached',
+      'args': [ '8.8.8.8' ]
+    }
+
+    client.request(query, (err, data) => {
+      if (err) throw err
+
+      assert.strictEqual(data[0], '8.8.8.8')
+      assert.ok(data[1].geo)
+      assert.ok(data[1].dns)
+      assert.ok(data[1].asn)
+
+      done()
+    })
+  }).timeout(7000)
+
   it('getIpAsn: retrieves asn info', (done) => {
     const query = {
       action: 'getIpAsn',
