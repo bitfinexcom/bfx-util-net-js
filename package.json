@@ -7,8 +7,9 @@
   "scripts": {
     "test": "npm run lint && npm run unit",
     "unit": "mocha",
+    "format": "standard --fix",
     "lint": "standard",
-    "update-geo-data": "node node_modules/geoip-lite/scripts/updatedb.js",
+    "update-geo-data": "LICENSE_KEY=YOUR_LICENSE_KEY node ./node_modules/geoip-lite/scripts/updatedb.js",
     "update-asn-data": "./update-asn-db.sh"
   },
   "dependencies": {
@@ -28,9 +29,9 @@
     "yargs": "^12.0.2"
   },
   "devDependencies": {
-    "mocha": "^5.2.0",
-    "standard": "^12.0.1",
-    "grenache-grape": "^0.9.9"
+    "grenache-grape": "^0.9.9",
+    "mocha": "^9.0.1",
+    "standard": "^16.0.3"
   },
   "engine": {
     "node": ">=8.0"
