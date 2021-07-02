@@ -45,13 +45,13 @@ class UtilNet extends Api {
 
   getIpGeo (space, ip, cb) {
     const res = this.ctx.geoIp.lookup(ip)
-    cb(null, [ ip, res ])
+    cb(null, [ip, res])
   }
 
   getIpAsn (space, ip, cb) {
     const res = this.ctx.asn_db.get(ip)
 
-    cb(null, [ ip, res ])
+    cb(null, [ip, res])
   }
 
   getIpGeoBatch (space, ips, cb) {
@@ -60,7 +60,7 @@ class UtilNet extends Api {
     }
 
     const res = ips.map((ip) => {
-      return [ ip, this.ctx.geoIp.lookup(ip) ]
+      return [ip, this.ctx.geoIp.lookup(ip)]
     })
 
     cb(null, res)
