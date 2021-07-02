@@ -35,6 +35,10 @@ grape --dp 20002 --aph 40001 --bn '127.0.0.1:20001'
 
 ### Update Geo/ASN data
 
+First replace YOUR_LICENSE_KEY with your free license key optained through 
+https://dev.maxmind.com/geoip/geolite2-free-geolocation-data?lang=en 
+in package.json and update-asn-db.sh files, then run: 
+
 ```
 npm run update-geo-data
 npm run update-asn-data

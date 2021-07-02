@@ -6,3 +6,5 @@ for file in $(find config -type f -name "*.example"); do
   echo "$file -> $new_name"
   cp "$file" "$new_name"
 done
+
+mkdir mmdb

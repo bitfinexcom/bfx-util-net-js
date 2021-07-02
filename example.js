@@ -8,7 +8,7 @@ const link = new Link({
 })
 link.start()
 
-let secure = false
+const secure = false
 const serviceName = 'rest:util:net'
 
 // ssl / fingerprint
@@ -23,7 +23,7 @@ const serviceName = 'rest:util:net'
 // }
 //
 
-let opts = {}
+const opts = {}
 if (secure) {
   opts.secure = secure
 }
@@ -33,7 +33,7 @@ peer.init()
 
 const geoQuery = {
   action: 'getIpGeo',
-  args: [ '8.8.8.8' ]
+  args: ['8.8.8.8']
 }
 
 peer.request(serviceName, geoQuery, { timeout: 10000 }, (err, data) => {
@@ -49,7 +49,7 @@ peer.request(serviceName, geoQuery, { timeout: 10000 }, (err, data) => {
 
 const asnQuery = {
   action: 'getIpAsn',
-  args: [ '8.8.8.8' ]
+  args: ['8.8.8.8']
 }
 
 peer.request(serviceName, asnQuery, { timeout: 10000 }, (err, data) => {
@@ -65,7 +65,7 @@ peer.request(serviceName, asnQuery, { timeout: 10000 }, (err, data) => {
 
 const generalQuery = {
   action: 'getIpInfo',
-  args: [ '8.8.8.8' ]
+  args: ['8.8.8.8']
 }
 peer.request(serviceName, generalQuery, { timeout: 10000 }, (err, data) => {
   if (err) {
