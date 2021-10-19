@@ -9,7 +9,8 @@
     "unit": "mocha",
     "format": "standard --fix",
     "lint": "standard",
-    "update-geo-data": "LICENSE_KEY=YOUR_LICENSE_KEY node ./node_modules/geoip-lite/scripts/updatedb.js",
+    "update-geo-data-free": "LICENSE_KEY=YOUR_LICENSE_KEY node ./node_modules/geoip-lite/scripts/updatedb.js",
+    "update-geo-data": "LICENSE_KEY=YOUR_LICENSE_KEY node ./scripts/updatedb.js",
     "update-asn-data": "./update-asn-db.sh"
   },
   "dependencies": {
