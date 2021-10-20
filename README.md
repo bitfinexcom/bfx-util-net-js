@@ -39,8 +39,15 @@ First replace YOUR_LICENSE_KEY with your free license key optained through
 https://dev.maxmind.com/geoip/geolite2-free-geolocation-data?lang=en 
 in package.json and update-asn-db.sh files, then run: 
 
+For Production/Staging
 ```
 npm run update-geo-data
+npm run update-asn-data
+```
+
+For Development
+```
+npm run update-geo-data-free
 npm run update-asn-data
 ```
 
