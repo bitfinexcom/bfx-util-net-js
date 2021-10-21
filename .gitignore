@@ -8,6 +8,7 @@ config/facs/*.json
 logs
 
 mmdb/*
+data/*
 sec
 package-lock.json
 .*.sw?
