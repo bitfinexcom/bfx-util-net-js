@@ -13,7 +13,7 @@
     "update-asn-data": "./update-asn-db.sh"
   },
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^3.2.1",
     "bfx-facs-api": "git+https://github.com/bitfinexcom/bfx-facs-api.git",
     "bfx-facs-base": "git+https://github.com/bitfinexcom/bfx-facs-base.git",
     "bfx-facs-grc": "git+https://github.com/bitfinexcom/bfx-facs-grc.git",
@@ -23,15 +23,15 @@
     "bfx-svc-test-helper": "https://github.com/bitfinexcom/bfx-svc-test-helper.git",
     "bfx-wrk-api": "git+https://github.com/bitfinexcom/bfx-wrk-api.git",
     "bfx-wrk-base": "git+https://github.com/bitfinexcom/bfx-wrk-base.git",
-    "geoip-lite": "^1.3.7",
-    "lodash": "^4.17.11",
-    "maxmind": "^2.12.0",
-    "yargs": "^12.0.2"
+    "geoip-lite": "1.3.7",
+    "lodash": "^4.17.21",
+    "maxmind": "2.12.0",
+    "yargs": "^17.2.1"
   },
   "devDependencies": {
     "grenache-grape": "^0.9.9",
-    "mocha": "^9.0.1",
-    "standard": "^16.0.3"
+    "mocha": "^9.1.3",
+    "standard": "^16.0.4"
   },
   "engine": {
     "node": ">=8.0"
