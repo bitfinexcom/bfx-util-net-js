@@ -9,7 +9,8 @@
     "unit": "mocha",
     "format": "standard --fix",
     "lint": "standard",
-    "update-geo-data": "LICENSE_KEY=YOUR_LICENSE_KEY node ./node_modules/geoip-lite/scripts/updatedb.js",
+    "update-geo-data-free": "LICENSE_KEY=YOUR_LICENSE_KEY node ./node_modules/geoip-lite/scripts/updatedb.js",
+    "update-geo-data": "LICENSE_KEY=YOUR_LICENSE_KEY node ./scripts/updatedb.js",
     "update-asn-data": "./update-asn-db.sh"
   },
   "dependencies": {
@@ -23,10 +24,19 @@
     "bfx-svc-test-helper": "https://github.com/bitfinexcom/bfx-svc-test-helper.git",
     "bfx-wrk-api": "git+https://github.com/bitfinexcom/bfx-wrk-api.git",
     "bfx-wrk-base": "git+https://github.com/bitfinexcom/bfx-wrk-base.git",
-    "geoip-lite": "1.3.7",
+    "colors": "1.4.0",
+    "geoip-lite": "1.4.2",
+    "grenache-nodejs-http": "^0.7.12",
+    "grenache-nodejs-link": "^0.7.12",
+    "https-proxy-agent": "5.0.0",
+    "iconv-lite": "0.6.3",
+    "ip-address": "8.1.0",
+    "lazy": "1.0.11",
     "lodash": "^4.17.21",
     "maxmind": "2.12.0",
-    "yargs": "^17.2.1"
+    "rimraf": "3.0.2",
+    "yargs": "^17.2.1",
+    "yauzl": "2.10.0"
   },
   "devDependencies": {
     "grenache-grape": "^0.9.9",
