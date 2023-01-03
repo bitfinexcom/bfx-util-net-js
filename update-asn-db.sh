@@ -3,7 +3,13 @@
 DESTDIR='./mmdb'
 ME="${BASH_SOURCE[0]}"
 
-wget --quiet --output-document="${DESTDIR}/GeoLite2-ASN.tar.gz" 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-ASN&license_key=YOUR_LICENSE_KEY&suffix=tar.gz' || {
+if [ -z ${MAXMIND_LICENSE+x} ]
+then
+  echo "Error, MAXMIND_LICENSE env must be set"
+fi
+
+
+wget --quiet --output-document="${DESTDIR}/GeoLite2-ASN.tar.gz" "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-ASN&license_key=$MAXMIND_LICENSE&suffix=tar.gz" || {
   echo "${ME##*/}: fatal error: download failed." >&2
   exit 1
 }
