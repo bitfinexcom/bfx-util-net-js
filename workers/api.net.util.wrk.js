@@ -1,9 +1,15 @@
 'use strict'
 
-const { WrkApi } = require('bfx-wrk-api')
-const maxmind = require('maxmind')
-const geoIp = require('geoip-lite')
 const path = require('path')
+
+// It looks like in the next release of geoip-lite
+// we can use GEODATADIR env instead of this gloabl env var,
+// but w/out it maxmind reads old data from in node_modules
+global.geodatadir = path.join(__dirname, '../data')
+const maxmind = require('maxmind')
+
+const { WrkApi } = require('bfx-wrk-api')
+const geoIp = require('geoip-lite')
 const fs = require('fs')
 
 const newDb = path.join(__dirname, '..', 'mmdb', 'GeoLite2-ASN.mmdb')
