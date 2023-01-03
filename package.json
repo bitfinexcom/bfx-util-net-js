@@ -9,8 +9,7 @@
     "unit": "mocha",
     "format": "standard --fix",
     "lint": "standard",
-    "update-geo-data-free": "LICENSE_KEY=YOUR_LICENSE_KEY node ./node_modules/geoip-lite/scripts/updatedb.js",
-    "update-geo-data": "LICENSE_KEY=YOUR_LICENSE_KEY node ./scripts/updatedb.js",
+    "update-geo-data": "./update-geo-db.sh",
     "update-asn-data": "./update-asn-db.sh"
   },
   "dependencies": {
@@ -25,7 +24,7 @@
     "bfx-wrk-api": "git+https://github.com/bitfinexcom/bfx-wrk-api.git",
     "bfx-wrk-base": "git+https://github.com/bitfinexcom/bfx-wrk-base.git",
     "colors": "1.4.0",
-    "geoip-lite": "1.4.2",
+    "geoip-lite": "1.4.6",
     "grenache-nodejs-http": "^0.7.12",
     "grenache-nodejs-link": "^0.7.12",
     "https-proxy-agent": "5.0.0",
