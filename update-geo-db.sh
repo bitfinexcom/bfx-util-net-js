@@ -1,8 +1,5 @@
 #!/bin/bash
 
-DESTDIR='./mmdb'
-ME="${BASH_SOURCE[0]}"
-
 if [ -z ${MAXMIND_LICENSE+x} ]
 then
   echo "Error, MAXMIND_LICENSE env must be set"
