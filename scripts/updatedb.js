@@ -37,8 +37,8 @@ const cityLookup = {}
 const databases = [
   {
     type: 'country',
-    url: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoIP2-Country-CSV&suffix=zip&' + licenseKey,
-    checksum: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoIP2-Country-CSV&suffix=zip.md5&' + licenseKey,
+    url: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoIP2-Country-CSV&suffix=zip&' + licenseKey,
+    checksum: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoIP2-Country-CSV&suffix=zip.md5&' + licenseKey,
     fileName: 'GeoIP2-Country-CSV.zip',
     src: [
       'GeoIP2-Country-Locations-en.csv',
@@ -53,8 +53,8 @@ const databases = [
   },
   {
     type: 'city',
-    url: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoIP2-City-CSV&suffix=zip&' + licenseKey,
-    checksum: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoIP2-City-CSV&suffix=zip.md5&' + licenseKey,
+    url: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoIP2-City-CSV&suffix=zip&' + licenseKey,
+    checksum: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoIP2-City-CSV&suffix=zip.md5&' + licenseKey,
     fileName: 'GeoIP2-City-CSV.zip',
     src: [
       'GeoIP2-City-Locations-en.csv',
