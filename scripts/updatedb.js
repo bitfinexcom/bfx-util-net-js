@@ -1,21 +1,35 @@
+//
+// This file is the following script with the following minimal changes:
+//
+//    https://github.com/geoip-lite/node-geoip/blob/main/scripts/updatedb.js
+//
+// with only the following modifications
+//
+//  1. eslint fixes
+//  2. GeoLite2 -> GeoIP2  (premium, more accurate date w/ premium license)
+//
+/* eslint-disable camelcase */
+
 // fetches and converts maxmind lite databases
 
 'use strict'
 
 const utils = require('geoip-lite/lib/utils')
 
-const userAgent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36'
+const user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36'
 
 const fs = require('fs')
 const http = require('http')
 const https = require('https')
 const path = require('path')
+const url = require('url')
 const zlib = require('zlib')
+const readline = require('readline')
 
 fs.existsSync = fs.existsSync || path.existsSync
 
 const async = require('async')
-const colors = require('colors') // eslint-disable-line no-unused-vars
+const chalk = require('chalk')
 const iconv = require('iconv-lite')
 const lazy = require('lazy')
 const rimraf = require('rimraf').sync
@@ -24,21 +38,34 @@ const Address6 = require('ip-address').Address6
 const Address4 = require('ip-address').Address4
 
 const args = process.argv.slice(2)
-let licenseKey = args.find(function (arg) {
+let license_key = args.find(function (arg) {
   return arg.match(/^license_key=[a-zA-Z0-9]+/) !== null
 })
-if (typeof licenseKey === 'undefined' && typeof process.env.LICENSE_KEY !== 'undefined') {
-  licenseKey = 'license_key=' + process.env.LICENSE_KEY
+if (typeof license_key === 'undefined' && typeof process.env.LICENSE_KEY !== 'undefined') {
+  license_key = 'license_key=' + process.env.LICENSE_KEY
 }
-const dataPath = path.join(__dirname, '..', 'data')
-const tmpPath = path.join(__dirname, '..', 'tmp')
+let geodatadir = args.find(function (arg) {
+  return arg.match(/^geodatadir=[\w./]+/) !== null
+})
+if (typeof geodatadir === 'undefined' && typeof process.env.GEODATADIR !== 'undefined') {
+  geodatadir = 'geodatadir=' + process.env.GEODATADIR
+}
+let dataPath = path.resolve(__dirname, '..', 'data')
+if (typeof geodatadir !== 'undefined') {
+  dataPath = path.resolve(process.cwd(), geodatadir.split('=')[1])
+  if (!fs.existsSync(dataPath)) {
+    console.log(chalk.red('ERROR') + ': Directory does\'t exist: ' + dataPath)
+    process.exit(1)
+  }
+}
+const tmpPath = process.env.GEOTMPDIR ? process.env.GEOTMPDIR : path.resolve(__dirname, '..', 'tmp')
 const countryLookup = {}
-const cityLookup = {}
+const cityLookup = { NaN: -1 }
 const databases = [
   {
     type: 'country',
-    url: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoIP2-Country-CSV&suffix=zip&' + licenseKey,
-    checksum: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoIP2-Country-CSV&suffix=zip.md5&' + licenseKey,
+    url: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoIP2-Country-CSV&suffix=zip&' + license_key,
+    checksum: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoIP2-Country-CSV&suffix=zip.sha256&' + license_key,
     fileName: 'GeoIP2-Country-CSV.zip',
     src: [
       'GeoIP2-Country-Locations-en.csv',
@@ -53,8 +80,8 @@ const databases = [
   },
   {
     type: 'city',
-    url: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoIP2-City-CSV&suffix=zip&' + licenseKey,
-    checksum: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoIP2-City-CSV&suffix=zip.md5&' + licenseKey,
+    url: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoIP2-City-CSV&suffix=zip&' + license_key,
+    checksum: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoIP2-City-CSV&suffix=zip.sha256&' + license_key,
     fileName: 'GeoIP2-City-CSV.zip',
     src: [
       'GeoIP2-City-Locations-en.csv',
@@ -80,7 +107,7 @@ function mkdir (name) {
 // Return array of string values, or NULL if CSV string not well formed.
 // Return array of string values, or NULL if CSV string not well formed.
 
-function tryFixingLine (line) {
+function try_fixing_line (line) {
   let pos1 = 0
   let pos2 = -1
   // escape quotes
@@ -90,7 +117,7 @@ function tryFixingLine (line) {
     pos1 = pos2
     pos2 = line.indexOf(',', pos1 + 1)
     if (pos2 < 0) pos2 = line.length
-    if (line.indexOf("'", (pos1 || 0)) > -1 && line.indexOf("'", pos1) < pos2 && line[pos1 + 1] !== '"' && line[pos2 - 1] !== '"') {
+    if (line.indexOf("'", (pos1 || 0)) > -1 && line.indexOf("'", pos1) < pos2 && line[pos1 + 1] != '"' && line[pos2 - 1] != '"') {
       line = line.substr(0, pos1 + 1) + '"' + line.substr(pos1 + 1, pos2 - pos1 - 1) + '"' + line.substr(pos2, line.length - pos2)
       pos2 = line.indexOf(',', pos2 + 1)
       if (pos2 < 0) pos2 = line.length
@@ -100,15 +127,15 @@ function tryFixingLine (line) {
 }
 
 function CSVtoArray (text) {
-  const reValid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/
-  const reValue = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g
+  const re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/
+  const re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g
   // Return NULL if input string is not well formed CSV string.
-  if (!reValid.test(text)) {
-    text = tryFixingLine(text)
-    if (!reValid.test(text)) { return null }
+  if (!re_valid.test(text)) {
+    text = try_fixing_line(text)
+    if (!re_valid.test(text)) { return null }
   }
   const a = [] // Initialize array to receive values.
-  text.replace(reValue, // "Walk" the string using replace with callback.
+  text.replace(re_value, // "Walk" the string using replace with callback.
     function (m0, m1, m2, m3) {
       // Remove backslash from \' in single quoted values.
       if (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"))
@@ -123,9 +150,9 @@ function CSVtoArray (text) {
 }
 
 function getHTTPOptions (downloadUrl) {
-  const options = new URL(downloadUrl)
+  const options = url.parse(downloadUrl)
   options.headers = {
-    'User-Agent': userAgent
+    'User-Agent': user_agent
   }
 
   if (process.env.http_proxy || process.env.https_proxy) {
@@ -156,7 +183,7 @@ function check (database, cb) {
   }
 
   // read existing checksum file
-  fs.readFile(path.join(dataPath, database.type + '.checksum'), function (err, data) {
+  fs.readFile(path.join(dataPath, database.type + '.checksum'), { encoding: 'utf8' }, function (err, data) {
     if (!err && data && data.length) {
       database.checkValue = data
     }
@@ -166,10 +193,12 @@ function check (database, cb) {
     function onResponse (response) {
       const status = response.statusCode
 
-      if (status !== 200) {
-        console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status])
+      if (status === 301 || status === 302 || status === 303 || status === 307 || status === 308) {
+        return https.get(getHTTPOptions(response.headers.location), onResponse)
+      } else if (status !== 200) {
+        console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status])
         client.abort()
-        process.exit()
+        process.exit(1)
       }
 
       let str = ''
@@ -179,24 +208,24 @@ function check (database, cb) {
 
       response.on('end', function () {
         if (str && str.length) {
-          if (str === database.checkValue) {
-            console.log(('Database "' + database.type + '" is up to date').green)
+          if (str == database.checkValue) {
+            console.log(chalk.green('Database "' + database.type + '" is up to date'))
             database.skip = true
           } else {
-            console.log(('Database ' + database.type + ' has new data').green)
+            console.log(chalk.green('Database ' + database.type + ' has new data'))
             database.checkValue = str
           }
         } else {
-          console.log('ERROR'.red + ': Could not retrieve checksum for', database.type, 'Aborting'.red)
+          console.log(chalk.red('ERROR') + ': Could not retrieve checksum for', database.type, chalk.red('Aborting'))
           console.log('Run with "force" to update without checksum')
           client.abort()
-          process.exit()
+          process.exit(1)
         }
         cb(null, database)
       })
     }
 
-    const client = https.get(getHTTPOptions(checksumUrl), onResponse)
+    var client = https.get(getHTTPOptions(checksumUrl), onResponse)
   })
 }
 
@@ -224,10 +253,12 @@ function fetch (database, cb) {
   function onResponse (response) {
     const status = response.statusCode
 
-    if (status !== 200) {
-      console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status])
+    if (status === 301 || status === 302 || status === 303 || status === 307 || status === 308) {
+      return https.get(getHTTPOptions(response.headers.location), onResponse)
+    } else if (status !== 200) {
+      console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status])
       client.abort()
-      process.exit()
+      process.exit(1)
     }
 
     let tmpFilePipe
@@ -240,14 +271,14 @@ function fetch (database, cb) {
     }
 
     tmpFilePipe.on('close', function () {
-      console.log(' DONE'.green)
+      console.log(chalk.green(' DONE'))
       cb(null, tmpFile, fileName, database)
     })
   }
 
   mkdir(tmpFile)
 
-  const client = https.get(getHTTPOptions(downloadUrl), onResponse)
+  var client = https.get(getHTTPOptions(downloadUrl), onResponse)
 
   process.stdout.write('Retrieving ' + fileName + ' ...')
 }
@@ -289,7 +320,7 @@ function extract (tmpFile, tmpFileName, database, cb) {
         }
       })
       zipfile.once('end', function () {
-        console.log(' DONE'.green)
+        console.log(chalk.green(' DONE'))
         cb(null, database)
       })
     })
@@ -317,14 +348,14 @@ function processLookupCountry (src, cb) {
     .skip(1)
     .map(processLine)
     .on('pipe', function () {
-      console.log(' DONE'.green)
+      console.log(chalk.green(' DONE'))
       cb()
     })
 }
 
-function processCountryData (src, dest, cb) {
+async function processCountryData (src, dest) {
   let lines = 0
-  function processLine (line) {
+  async function processLine (line) {
     const fields = CSVtoArray(line)
 
     if (!fields || fields.length < 6) {
@@ -371,11 +402,17 @@ function processCountryData (src, dest, cb) {
       }
 
       b.write(cc, bsz - 2)
-
-      fs.writeSync(datFile, b, 0, bsz, null)
       if (Date.now() - tstart > 5000) {
         tstart = Date.now()
         process.stdout.write('\nStill working (' + lines + ') ...')
+      }
+
+      if (datFile._writableState.needDrain) {
+        return new Promise((resolve) => {
+          datFile.write(b, resolve)
+        })
+      } else {
+        return datFile.write(b)
       }
     }
   }
@@ -387,25 +424,26 @@ function processCountryData (src, dest, cb) {
   mkdir(dataFile)
 
   process.stdout.write('Processing Data (may take a moment) ...')
-  let tstart = Date.now()
-  const datFile = fs.openSync(dataFile, 'w')
+  var tstart = Date.now()
+  var datFile = fs.createWriteStream(dataFile)
 
-  lazy(fs.createReadStream(tmpDataFile))
-    .lines
-    .map(function (byteArray) {
-      return iconv.decode(byteArray, 'latin1')
-    })
-    .skip(1)
-    .map(processLine)
-    .on('pipe', function () {
-      console.log(' DONE'.green)
-      cb()
-    })
+  const rl = readline.createInterface({
+    input: fs.createReadStream(tmpDataFile),
+    crlfDelay: Infinity
+  })
+  let i = 0
+  for await (const line of rl) {
+    i++
+    if (i == 1) continue
+    await processLine(line)
+  }
+  datFile.close()
+  console.log(chalk.green(' DONE'))
 }
 
-function processCityData (src, dest, cb) {
+async function processCityData (src, dest) {
   let lines = 0
-  function processLine (line) {
+  async function processLine (line) {
     if (line.match(/^Copyright/) || !line.match(/\d/)) {
       return
     }
@@ -482,10 +520,17 @@ function processCityData (src, dest, cb) {
       b.writeInt32BE(area, 20)
     }
 
-    fs.writeSync(datFile, b, 0, b.length, null)
     if (Date.now() - tstart > 5000) {
       tstart = Date.now()
       process.stdout.write('\nStill working (' + lines + ') ...')
+    }
+
+    if (datFile._writableState.needDrain) {
+      return new Promise((resolve) => {
+        datFile.write(b, resolve)
+      })
+    } else {
+      return datFile.write(b)
     }
   }
 
@@ -495,17 +540,20 @@ function processCityData (src, dest, cb) {
   rimraf(dataFile)
 
   process.stdout.write('Processing Data (may take a moment) ...')
-  let tstart = Date.now()
-  const datFile = fs.openSync(dataFile, 'w')
+  var tstart = Date.now()
+  var datFile = fs.createWriteStream(dataFile)
 
-  lazy(fs.createReadStream(tmpDataFile))
-    .lines
-    .map(function (byteArray) {
-      return iconv.decode(byteArray, 'latin1')
-    })
-    .skip(1)
-    .map(processLine)
-    .on('pipe', cb)
+  const rl = readline.createInterface({
+    input: fs.createReadStream(tmpDataFile),
+    crlfDelay: Infinity
+  })
+  let i = 0
+  for await (const line of rl) {
+    i++
+    if (i == 1) continue
+    await processLine(line)
+  }
+  datFile.close()
 }
 
 function processCityDataNames (src, dest, cb) {
@@ -516,10 +564,11 @@ function processCityDataNames (src, dest, cb) {
       return
     }
 
+    let b
     const sz = 88
     const fields = CSVtoArray(line)
     if (!fields) {
-      // lot's of cities contain ` or ' in the name and can't be parsed correctly with current method
+      // lots of cities contain ` or ' in the name and can't be parsed correctly with current method
       console.log('weird line: %s::', line)
       return
     }
@@ -535,7 +584,7 @@ function processCityDataNames (src, dest, cb) {
     const tz = fields[12]
     const eu = fields[13]
 
-    const b = Buffer.alloc(sz)
+    b = Buffer.alloc(sz)
     b.fill(0)
     b.write(cc, 0)// country code
     b.write(rg, 2)// region
@@ -556,7 +605,7 @@ function processCityDataNames (src, dest, cb) {
 
   rimraf(dataFile)
 
-  const datFile = fs.openSync(dataFile, 'w')
+  var datFile = fs.openSync(dataFile, 'w')
 
   lazy(fs.createReadStream(tmpDataFile))
     .lines
@@ -580,10 +629,10 @@ function processData (database, cb) {
   if (type === 'country') {
     if (Array.isArray(src)) {
       processLookupCountry(src[0], function () {
-        processCountryData(src[1], dest[1], function () {
-          processCountryData(src[2], dest[2], function () {
-            cb(null, database)
-          })
+        processCountryData(src[1], dest[1]).then(() => {
+          return processCountryData(src[2], dest[2])
+        }).then(() => {
+          cb(null, database)
         })
       })
     } else {
@@ -593,12 +642,12 @@ function processData (database, cb) {
     }
   } else if (type === 'city') {
     processCityDataNames(src[0], dest[0], function () {
-      processCityData(src[1], dest[1], function () {
+      processCityData(src[1], dest[1]).then(() => {
         console.log('city data processed')
-        processCityData(src[2], dest[2], function () {
-          console.log(' DONE'.green)
-          cb(null, database)
-        })
+        return processCityData(src[2], dest[2])
+      }).then(() => {
+        console.log(chalk.green(' DONE'))
+        cb(null, database)
       })
     })
   }
@@ -610,13 +659,13 @@ function updateChecksum (database, cb) {
     return cb()
   }
   fs.writeFile(path.join(dataPath, database.type + '.checksum'), database.checkValue, 'utf8', function (err) {
-    if (err) console.log('Failed to Update checksums.'.red, 'Database:', database.type)
+    if (err) console.log(chalk.red('Failed to Update checksums.'), 'Database:', database.type)
     cb()
   })
 }
 
-if (!licenseKey) {
-  console.log('ERROR'.red + ': Missing license_key')
+if (!license_key) {
+  console.log(chalk.red('ERROR') + ': Missing license_key')
   process.exit(1)
 }
 
@@ -627,12 +676,15 @@ async.eachSeries(databases, function (database, nextDatabase) {
   async.seq(check, fetch, extract, processData, updateChecksum)(database, nextDatabase)
 }, function (err) {
   if (err) {
-    console.log('Failed to Update Databases from MaxMind.'.red, err)
+    console.log(chalk.red('Failed to Update Databases from MaxMind.'), err)
     process.exit(1)
   } else {
-    console.log('Successfully Updated Databases from MaxMind.'.green)
-    if (args.indexOf('debug') !== -1) console.log('Notice: temporary files are not deleted for debug purposes.'.bold.yellow)
-    else rimraf(tmpPath)
+    console.log(chalk.green('Successfully Updated Databases from MaxMind.'))
+    if (args.indexOf('debug') !== -1) {
+      console.log(chalk.yellow.bold('Notice: temporary files are not deleted for debug purposes.'))
+    } else {
+      rimraf(tmpPath)
+    }
     process.exit(0)
   }
 })
