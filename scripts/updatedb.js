@@ -22,7 +22,6 @@ const fs = require('fs')
 const http = require('http')
 const https = require('https')
 const path = require('path')
-const url = require('url')
 const zlib = require('zlib')
 const readline = require('readline')
 
@@ -117,7 +116,7 @@ function try_fixing_line (line) {
     pos1 = pos2
     pos2 = line.indexOf(',', pos1 + 1)
     if (pos2 < 0) pos2 = line.length
-    if (line.indexOf("'", (pos1 || 0)) > -1 && line.indexOf("'", pos1) < pos2 && line[pos1 + 1] != '"' && line[pos2 - 1] != '"') {
+    if (line.indexOf("'", (pos1 || 0)) > -1 && line.indexOf("'", pos1) < pos2 && line[pos1 + 1] !== '"' && line[pos2 - 1] !== '"') {
       line = line.substr(0, pos1 + 1) + '"' + line.substr(pos1 + 1, pos2 - pos1 - 1) + '"' + line.substr(pos2, line.length - pos2)
       pos2 = line.indexOf(',', pos2 + 1)
       if (pos2 < 0) pos2 = line.length
@@ -150,7 +149,7 @@ function CSVtoArray (text) {
 }
 
 function getHTTPOptions (downloadUrl) {
-  const options = url.parse(downloadUrl)
+  const options = new URL(downloadUrl)
   options.headers = {
     'User-Agent': user_agent
   }
@@ -208,7 +207,7 @@ function check (database, cb) {
 
       response.on('end', function () {
         if (str && str.length) {
-          if (str == database.checkValue) {
+          if (str === database.checkValue) {
             console.log(chalk.green('Database "' + database.type + '" is up to date'))
             database.skip = true
           } else {
@@ -225,7 +224,7 @@ function check (database, cb) {
       })
     }
 
-    var client = https.get(getHTTPOptions(checksumUrl), onResponse)
+    const client = https.get(getHTTPOptions(checksumUrl), onResponse)
   })
 }
 
@@ -278,7 +277,7 @@ function fetch (database, cb) {
 
   mkdir(tmpFile)
 
-  var client = https.get(getHTTPOptions(downloadUrl), onResponse)
+  const client = https.get(getHTTPOptions(downloadUrl), onResponse)
 
   process.stdout.write('Retrieving ' + fileName + ' ...')
 }
@@ -424,8 +423,8 @@ async function processCountryData (src, dest) {
   mkdir(dataFile)
 
   process.stdout.write('Processing Data (may take a moment) ...')
-  var tstart = Date.now()
-  var datFile = fs.createWriteStream(dataFile)
+  let tstart = Date.now()
+  const datFile = fs.createWriteStream(dataFile)
 
   const rl = readline.createInterface({
     input: fs.createReadStream(tmpDataFile),
@@ -434,7 +433,7 @@ async function processCountryData (src, dest) {
   let i = 0
   for await (const line of rl) {
     i++
-    if (i == 1) continue
+    if (i === 1) continue
     await processLine(line)
   }
   datFile.close()
@@ -540,8 +539,8 @@ async function processCityData (src, dest) {
   rimraf(dataFile)
 
   process.stdout.write('Processing Data (may take a moment) ...')
-  var tstart = Date.now()
-  var datFile = fs.createWriteStream(dataFile)
+  let tstart = Date.now()
+  const datFile = fs.createWriteStream(dataFile)
 
   const rl = readline.createInterface({
     input: fs.createReadStream(tmpDataFile),
@@ -550,7 +549,7 @@ async function processCityData (src, dest) {
   let i = 0
   for await (const line of rl) {
     i++
-    if (i == 1) continue
+    if (i === 1) continue
     await processLine(line)
   }
   datFile.close()
@@ -564,7 +563,6 @@ function processCityDataNames (src, dest, cb) {
       return
     }
 
-    let b
     const sz = 88
     const fields = CSVtoArray(line)
     if (!fields) {
@@ -584,7 +582,7 @@ function processCityDataNames (src, dest, cb) {
     const tz = fields[12]
     const eu = fields[13]
 
-    b = Buffer.alloc(sz)
+    const b = Buffer.alloc(sz)
     b.fill(0)
     b.write(cc, 0)// country code
     b.write(rg, 2)// region
@@ -605,7 +603,7 @@ function processCityDataNames (src, dest, cb) {
 
   rimraf(dataFile)
 
-  var datFile = fs.openSync(dataFile, 'w')
+  const datFile = fs.openSync(dataFile, 'w')
 
   lazy(fs.createReadStream(tmpDataFile))
     .lines
