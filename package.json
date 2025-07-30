@@ -24,7 +24,7 @@
     "bfx-wrk-api": "git+https://github.com/bitfinexcom/bfx-wrk-api.git",
     "bfx-wrk-base": "git+https://github.com/bitfinexcom/bfx-wrk-base.git",
     "colors": "1.4.0",
-    "geoip-lite": "1.4.6",
+    "geoip-lite": "1.4.10",
     "grenache-nodejs-http": "^0.7.12",
     "grenache-nodejs-link": "^0.7.12",
     "https-proxy-agent": "5.0.0",
@@ -32,7 +32,7 @@
     "ip-address": "8.1.0",
     "lazy": "1.0.11",
     "lodash": "^4.17.21",
-    "maxmind": "2.12.0",
+    "maxmind": "4.3.28",
     "rimraf": "3.0.2",
     "yargs": "^17.2.1",
     "yauzl": "2.10.0"
