@@ -10,5 +10,4 @@ logs
 mmdb/*
 data/*
 sec
-package-lock.json
 .*.sw?
