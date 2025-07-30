@@ -21,7 +21,12 @@ class WrkUtilNetApi extends WrkApi {
     this.loadConf('net.util', 'util')
 
     this.init()
-    this.start()
+    this.start((error) => {
+      if (error) {
+        process.stderr.write(`failed to start worker: ${error.message}\n`)
+        process.exit(1)
+      }
+    })
   }
 
   getPluginCtx (type) {
@@ -40,19 +45,43 @@ class WrkUtilNetApi extends WrkApi {
 
   init () {
     super.init()
+    this.testIfDbExists()
 
     this.setInitFacs([
       ['fac', 'bfx-facs-lru', '0', '0', { maxAge: 86400 * 30 * 1000 }]
     ])
+  }
 
-    this.geoIp = geoIp
-    this.testIfDbExists()
-    this.asnDb = maxmind.openSync(newDb, {
-      watchForUpdates: true,
-      watchForUpdatesNonPersistent: true
-    })
+  async _start (cb) {
+    try {
+      await new Promise((resolve, reject) => super._start((error) => {
+        return error
+          ? reject(error)
+          : resolve()
+      }))
 
-    geoIp.startWatchingDataUpdate()
+      this.geoIp = geoIp
+
+      this.asnDb = await maxmind.open(newDb, {
+        watchForUpdates: true,
+        watchForUpdatesNonPersistent: true,
+        watchForUpdatesHook: () => {
+          process.stdout.write('ASN database has been reloaded\n')
+        }
+      })
+
+      this.geoIp.startWatchingDataUpdate((err) => {
+        if (err instanceof Error) {
+          process.stderr.write(`ERR: ${err.message}\n`)
+        } else {
+          process.stdout.write('GeoIP database has been reloaded\n')
+        }
+      })
+
+      cb()
+    } catch (error) {
+      cb(error)
+    }
   }
 
   stop (cb = () => {}) {

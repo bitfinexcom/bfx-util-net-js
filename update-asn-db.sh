@@ -1,23 +1,30 @@
 #!/bin/bash
 
-DESTDIR='./mmdb'
-ME="${BASH_SOURCE[0]}"
+trap '[[ -f "${TMPFILE}" ]] && rm --force "${TMPFILE}"' 'EXIT'
 
-if [ -z ${MAXMIND_LICENSE} ]
-then
-  echo "Error, MAXMIND_LICENSE env must be set"
-  exit 0
-fi
+readonly DESTDIR="${DESTDIR:-mmdb}"
+readonly ARCHIVE="${DESTDIR}/GeoLite2-ASN.tar.gz"
+readonly LOCAL_TIMESTAMP="$(date +'%s' --reference="${ARCHIVE}" 2>/dev/null)"
+readonly MAXMIND_LICENSE="${MAXMIND_LICENSE:-$(head --quiet --lines=1 'MAXMIND_KEY' 2>/dev/null)}"
 
-
-wget --quiet --output-document="${DESTDIR}/GeoLite2-ASN.tar.gz" "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-ASN&license_key=${MAXMIND_LICENSE}&suffix=tar.gz" || {
-  echo "${ME##*/}: fatal error: download failed." >&2
+[[ "${MAXMIND_LICENSE:-}" =~ ^[[:alnum:]]+$ ]] || {
+  echo "${BASH_SOURCE[0]##*/}: fatal error: license key has not been provided." >&2
   exit 1
 }
 
-tar --extract --directory "${DESTDIR}" --strip-components=1 \
-  --wildcards '*.mmdb' --file "${DESTDIR}/GeoLite2-ASN.tar.gz" || exit 1
+[[ -d "${DESTDIR}" ]] \
+  || mkdir --parents "${DESTDIR}"
 
-rm "${DESTDIR}/GeoLite2-ASN.tar.gz"
+curl --silent --fail --output "${ARCHIVE}" --time-cond "${ARCHIVE}" --location "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-ASN&license_key=${MAXMIND_LICENSE}&suffix=tar.gz" || {
+  echo "${BASH_SOURCE[0]##*/}: fatal error: download failed." >&2
+  exit 1
+}
 
-exit 0
+[[ "${LOCAL_TIMESTAMP}" = "$(date +'%s' --reference="${ARCHIVE}" 2>/dev/null)" ]] || {
+  readonly TMPFILE="$(mktemp -p "${DESTDIR}" -t 'GeoLite2-ASN.mmdb.XXXXXXXXXXXXXXXX')"
+
+  tar --extract --directory "${DESTDIR}" --strip-components=1 --wildcards '*.mmdb' \
+    --transform='flags=rSH;s|GeoLite2-ASN\.mmdb$|'"${TMPFILE##*/}"'|g' --file "${ARCHIVE}" || exit 1
+
+  cat "${TMPFILE}" >"${DESTDIR}/GeoLite2-ASN.mmdb"
+}
