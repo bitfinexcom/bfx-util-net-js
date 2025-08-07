@@ -14,13 +14,15 @@ class UtilNet extends Api {
   getIpInfo (space, ip, cb) {
     const geoData = this.ctx.geoIp.lookup(ip)
     const asnData = this.ctx.asn_db.get(ip)
+    const ispData = this.ctx.isp_db.get(ip)
+    const connectionTypeData = this.ctx.connectionType_db.get(ip)
 
     dns.reverse(ip, (err, dnsData) => {
       if (err) return cb(err)
 
       const res = [
         ip,
-        { geo: geoData, dns: dnsData, asn: asnData }
+        { geo: geoData, dns: dnsData, asn: asnData, isp: ispData, connectionType: connectionTypeData }
       ]
 
       cb(null, res)
@@ -50,6 +52,18 @@ class UtilNet extends Api {
 
   getIpAsn (space, ip, cb) {
     const res = this.ctx.asn_db.get(ip)
+
+    cb(null, [ip, res])
+  }
+
+  getIpIsp (space, ip, cb) {
+    const res = this.ctx.isp_db.get(ip)
+
+    cb(null, [ip, res])
+  }
+
+  getIpConnectionType (space, ip, cb) {
+    const res = this.ctx.connectionType_db.get(ip)
 
     cb(null, [ip, res])
   }

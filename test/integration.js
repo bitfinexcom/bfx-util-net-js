@@ -118,11 +118,12 @@ describe('RPC integration', () => {
     client.request(query, (err, data) => {
       try {
         if (err) throw err
-
         assert.strictEqual(data[0], '8.8.8.8')
         assert.ok(data[1].geo)
         assert.ok(data[1].dns)
         assert.ok(data[1].asn)
+        assert.ok(data[1].isp)
+        assert.ok(data[1].connectionType)
 
         done()
       } catch (err) {
@@ -145,6 +146,8 @@ describe('RPC integration', () => {
         assert.ok(data[1].geo)
         assert.ok(data[1].dns)
         assert.ok(data[1].asn)
+        assert.ok(data[1].isp)
+        assert.ok(data[1].connectionType)
 
         done()
       } catch (err) {
@@ -167,6 +170,8 @@ describe('RPC integration', () => {
         assert.ok(data[1].geo)
         assert.ok(data[1].dns)
         assert.ok(data[1].asn)
+        assert.ok(data[1].isp)
+        assert.ok(data[1].connectionType)
 
         done()
       } catch (err) {
@@ -192,6 +197,52 @@ describe('RPC integration', () => {
           'owned by google'
         )
 
+        done()
+      } catch (err) {
+        done(err)
+      }
+    })
+  }).timeout(7000)
+
+  it('geo-isp: retrieves ips ISP', (done) => {
+    const query = {
+      action: 'getIpIsp',
+      args: ['53.1.34.21']
+    }
+
+    client.request(query, (err, data) => {
+      try {
+        if (err) throw err
+
+        assert.strictEqual(
+          data[0], '53.1.34.21', 'result contains queried ip'
+        )
+
+        const res = data[1]
+        assert.strictEqual(res.isp, 'Mercedes-Benz Group')
+        done()
+      } catch (err) {
+        done(err)
+      }
+    })
+  }).timeout(7000)
+
+  it('getIpConnectionType: retrieves ips connection type', (done) => {
+    const query = {
+      action: 'getIpConnectionType',
+      args: ['53.1.34.21']
+    }
+
+    client.request(query, (err, data) => {
+      try {
+        if (err) throw err
+
+        assert.strictEqual(
+          data[0], '53.1.34.21', 'result contains queried ip'
+        )
+
+        const res = data[1]
+        assert.strictEqual(res.connection_type, 'Cable/DSL')
         done()
       } catch (err) {
         done(err)
