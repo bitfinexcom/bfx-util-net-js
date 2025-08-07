@@ -12,7 +12,9 @@ const { WrkApi } = require('bfx-wrk-api')
 const geoIp = require('geoip-lite')
 const fs = require('fs')
 
-const newDb = path.join(__dirname, '..', 'mmdb', 'GeoLite2-ASN.mmdb')
+const asnMMDB = path.join(__dirname, '..', 'mmdb', 'GeoLite2-ASN.mmdb')
+const ispMMDB = path.join(__dirname, '..', 'mmdb', 'GeoIP2-ISP.mmdb')
+const connectionTypeMMDB = path.join(__dirname, '..', 'mmdb', 'GeoIP2-Connection-Type.mmdb')
 
 class WrkUtilNetApi extends WrkApi {
   constructor (conf, ctx) {
@@ -37,6 +39,8 @@ class WrkUtilNetApi extends WrkApi {
         ctx.lru_0 = this.lru_0
         ctx.asn_db = this.asnDb
         ctx.geoIp = this.geoIp
+        ctx.isp_db = this.ispDb
+        ctx.connectionType_db = this.connectionTypeDb
         break
     }
 
@@ -62,11 +66,27 @@ class WrkUtilNetApi extends WrkApi {
 
       this.geoIp = geoIp
 
-      this.asnDb = await maxmind.open(newDb, {
+      this.asnDb = await maxmind.open(asnMMDB, {
         watchForUpdates: true,
         watchForUpdatesNonPersistent: true,
         watchForUpdatesHook: () => {
           process.stdout.write('ASN database has been reloaded\n')
+        }
+      })
+
+      this.ispDb = await maxmind.open(ispMMDB, {
+        watchForUpdates: true,
+        watchForUpdatesNonPersistent: true,
+        watchForUpdatesHook: () => {
+          process.stdout.write('ISP database has been reloaded\n')
+        }
+      })
+
+      this.connectionTypeDb = await maxmind.open(connectionTypeMMDB, {
+        watchForUpdates: true,
+        watchForUpdatesNonPersistent: true,
+        watchForUpdatesHook: () => {
+          process.stdout.write('Connection type database has been reloaded\n')
         }
       })
 
@@ -92,8 +112,16 @@ class WrkUtilNetApi extends WrkApi {
   }
 
   testIfDbExists () {
-    if (!fs.existsSync(newDb)) {
+    if (!fs.existsSync(asnMMDB)) {
       throw new Error('GEO_DB_NOT_INSTALLED - run `npm run update-asn-data`')
+    }
+
+    if (!fs.existsSync(ispMMDB)) {
+      throw new Error('GEO_DB_NOT_INSTALLED - run `npm run update-isp-data`')
+    }
+
+    if (!fs.existsSync(connectionTypeMMDB)) {
+      throw new Error('GEO_DB_NOT_INSTALLED - run `npm run update-connection-type-data`')
     }
   }
 }
