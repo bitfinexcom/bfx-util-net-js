@@ -117,11 +117,11 @@ class WrkUtilNetApi extends WrkApi {
     }
 
     if (!fs.existsSync(ispMMDB)) {
-      throw new Error('GEO_DB_NOT_INSTALLED - run `npm run update-isp-data`')
+      throw new Error('ISP_DB_NOT_INSTALLED - run `npm run update-isp-data`')
     }
 
     if (!fs.existsSync(connectionTypeMMDB)) {
-      throw new Error('GEO_DB_NOT_INSTALLED - run `npm run update-connection-type-data`')
+      throw new Error('CONNECTION_TYPE_DB_NOT_INSTALLED - run `npm run update-connection-type-data`')
     }
   }
 }
