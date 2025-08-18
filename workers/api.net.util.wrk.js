@@ -37,10 +37,10 @@ class WrkUtilNetApi extends WrkApi {
     switch (type) {
       case 'api_bfx':
         ctx.lru_0 = this.lru_0
-        ctx.asn_db = this.asnDb
+        ctx.asnDb = this.asnDb
         ctx.geoIp = this.geoIp
-        ctx.isp_db = this.ispDb
-        ctx.connectionType_db = this.connectionTypeDb
+        ctx.ispDb = this.ispDb
+        ctx.connectionTypeDb = this.connectionTypeDb
         break
     }
 
