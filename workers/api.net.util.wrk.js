@@ -1,7 +1,7 @@
 'use strict'
 
 const path = require('path')
-
+const _ = require('lodash')
 // It looks like in the next release of geoip-lite
 // we can use GEODATADIR env instead of this gloabl env var,
 // but w/out it maxmind reads old data from in node_modules
@@ -41,6 +41,10 @@ class WrkUtilNetApi extends WrkApi {
         ctx.geoIp = this.geoIp
         ctx.ispDb = this.ispDb
         ctx.connectionTypeDb = this.connectionTypeDb
+        ctx.conf = ctx.conf || {}
+        _.extend(ctx.conf, {
+          maxAccuracyRadius: this.conf.util.maxAccuracyRadius
+        })
         break
     }
 

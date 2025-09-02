@@ -12,7 +12,7 @@ class UtilNet extends Api {
   }
 
   getIpInfo (space, ip, cb) {
-    const geoData = this.ctx.geoIp.lookup(ip)
+    const geoData = this._getGeoIp(ip)
     const asnData = this.ctx.asnDb.get(ip)
     const ispData = this.ctx.ispDb.get(ip)
     const connectionTypeData = this.ctx.connectionTypeDb.get(ip)
@@ -46,7 +46,7 @@ class UtilNet extends Api {
   }
 
   getIpGeo (space, ip, cb) {
-    const res = this.ctx.geoIp.lookup(ip)
+    const res = this._getGeoIp(ip)
     cb(null, [ip, res])
   }
 
@@ -74,7 +74,7 @@ class UtilNet extends Api {
     }
 
     const res = ips.map((ip) => {
-      return [ip, this.ctx.geoIp.lookup(ip)]
+      return [ip, this._getGeoIp(ip)]
     })
 
     cb(null, res)
@@ -86,6 +86,26 @@ class UtilNet extends Api {
 
       cb(null, [ip, data])
     })
+  }
+
+  _getGeoIp (ip) {
+    const res = this.ctx.geoIp.lookup(ip)
+    const { maxAccuracyRadius } = this.ctx.conf
+
+    const confidenceScore = this._calculateConfidenceScore(res, maxAccuracyRadius)
+    return { ...res, confidenceScore }
+  }
+
+  _calculateConfidenceScore (geo, maxAccuracyRadius) {
+    if (!geo || geo.area == null) {
+      return 0
+    }
+    const accuracyRadius = geo.area
+
+    // Simple linear mapping of radius to confidence score
+    const confidence = Math.max(0, Math.min(1, 1 - (accuracyRadius / maxAccuracyRadius)))
+
+    return confidence
   }
 }
 
