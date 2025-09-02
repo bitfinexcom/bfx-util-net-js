@@ -91,21 +91,20 @@ class UtilNet extends Api {
 
   _getGeoIp (ip) {
     const res = this.ctx.geoIp.lookup(ip)
-    const confidenceScore = this._calculateConfidenceScore(res)
+    const { maxAccuracyRadius } = this.ctx.conf
+
+    const confidenceScore = this._calculateConfidenceScore(res, maxAccuracyRadius)
     return { ...res, confidenceScore }
   }
 
-  _calculateConfidenceScore (geo) {
+  _calculateConfidenceScore (geo, maxAccuracyRadius) {
     if (!geo || geo.area == null) {
       return 0
     }
     const accuracyRadius = geo.area
 
-    // Define a max expected radius beyond which confidence is zero
-    const maxExpectedRadius = 500 // kilometers
-
     // Simple linear mapping of radius to confidence score
-    const confidence = Math.max(0, Math.min(1, 1 - (accuracyRadius / maxExpectedRadius)))
+    const confidence = Math.max(0, Math.min(1, 1 - (accuracyRadius / maxAccuracyRadius)))
 
     return confidence
   }
