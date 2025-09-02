@@ -20,10 +20,9 @@ class UtilNet extends Api {
     dns.reverse(ip, (err, dnsData) => {
       if (err) return cb(err)
 
-      const confidenceScore = this._calculateConfidenceScore(geoData)
       const res = [
         ip,
-        { geo: geoData, dns: dnsData, asn: asnData, isp: ispData, connectionType: connectionTypeData, confidenceScore }
+        { geo: geoData, dns: dnsData, asn: asnData, isp: ispData, connectionType: connectionTypeData }
       ]
 
       cb(null, res)
