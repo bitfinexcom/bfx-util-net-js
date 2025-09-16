@@ -249,4 +249,54 @@ describe('RPC integration', () => {
       }
     })
   }).timeout(7000)
+
+  it('geo-ip: retrieves ips with accuracy_radius < 500km has confidence score > 0', (done) => {
+    const query = {
+      action: 'getIpGeo',
+      args: ['2.125.160.216']
+    }
+
+    client.request(query, (err, data) => {
+      try {
+        if (err) throw err
+
+        assert.strictEqual(
+          data[0], '2.125.160.216', 'result contains queried ip'
+        )
+
+        const res = data[1]
+        assert.ok(res.area < 500)
+        assert.ok(res.confidenceScore > 0 && res.confidenceScore < 1)
+        assert.strictEqual(res.country, 'GB')
+        done()
+      } catch (err) {
+        done(err)
+      }
+    })
+  }).timeout(7000)
+
+  it('geo-ip: retrieves ips with accuracy_radius > 500km has confidence score=0', (done) => {
+    const query2 = {
+      action: 'getIpGeo',
+      args: ['8.8.8.8']
+    }
+
+    client.request(query2, (err, data) => {
+      try {
+        if (err) throw err
+
+        assert.strictEqual(
+          data[0], '8.8.8.8', 'result contains queried ip'
+        )
+
+        const res = data[1]
+        assert.ok(res.area > 500)
+        assert.strictEqual(res.confidenceScore, 0)
+        assert.strictEqual(res.country, 'US')
+        done()
+      } catch (err) {
+        done(err)
+      }
+    })
+  }).timeout(7000)
 })

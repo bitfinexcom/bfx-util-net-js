@@ -44,6 +44,8 @@ export MAXMIND_LICENSE='your secret license'
 ```
 npm run update-geo-data
 npm run update-asn-data
+npm run update-isp-data
+npm run update-connection-type-data
 ```
 
 ### Periodic Updates for Geo/ASN data

@@ -1,3 +1,4 @@
 {
-  "grcServices": [ "rest:util:net" ]
+  "grcServices": [ "rest:util:net" ],
+  "maxAccuracyRadius": 500
 }
