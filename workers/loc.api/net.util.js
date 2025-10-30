@@ -1,7 +1,7 @@
 'use strict'
 
 const _ = require('lodash')
-const dns = require('dns')
+const dns = require('dns').promises
 
 const { Api } = require('bfx-wrk-api')
 
@@ -11,22 +11,30 @@ class UtilNet extends Api {
     return space
   }
 
-  getIpInfo (space, ip, cb) {
+  async getIpInfo (space, ip, cb) {
     const geoData = this._getGeoIp(ip)
     const asnData = this.ctx.asnDb.get(ip)
     const ispData = this.ctx.ispDb.get(ip)
     const connectionTypeData = this.ctx.connectionTypeDb.get(ip)
 
-    dns.reverse(ip, (err, dnsData) => {
-      if (err) return cb(err)
+    let dnsData = null
+    try {
+      dnsData = await dns.reverse(ip)
+    } catch (err) {
+      console.warn('An error occurred during DNS reverse lookup. Err=[%s]', err)
+    }
+    const res = [
+      ip,
+      {
+        geo: geoData,
+        dns: dnsData,
+        asn: asnData,
+        isp: ispData,
+        connectionType: connectionTypeData
+      }
+    ]
 
-      const res = [
-        ip,
-        { geo: geoData, dns: dnsData, asn: asnData, isp: ispData, connectionType: connectionTypeData }
-      ]
-
-      cb(null, res)
-    })
+    cb(null, res)
   }
 
   getIpInfoCached (space, ip, cb) {
@@ -80,12 +88,13 @@ class UtilNet extends Api {
     cb(null, res)
   }
 
-  getReverseDns (space, ip, cb) {
-    dns.reverse(ip, (err, data) => {
-      if (err) return cb(err)
-
-      cb(null, [ip, data])
-    })
+  async getReverseDns (space, ip, cb) {
+    try {
+      const dnsData = await dns.reverse(ip)
+      return cb(null, [ip, dnsData])
+    } catch (err) {
+      return cb(err)
+    }
   }
 
   _getGeoIp (ip) {
