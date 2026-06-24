@@ -12,7 +12,8 @@
     "update-geo-data": "./update-geo-db.sh",
     "update-asn-data": "./update-asn-db.sh",
     "update-isp-data": "./update-isp-db.sh",
-    "update-connection-type-data": "./update-connection-type-db.sh"
+    "update-connection-type-data": "./update-connection-type-db.sh",
+    "update-anonymous-plus-data": "./update-anonymous-plus-db.sh"
   },
   "dependencies": {
     "async": "^3.2.1",

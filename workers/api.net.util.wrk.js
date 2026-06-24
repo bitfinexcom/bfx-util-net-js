@@ -15,6 +15,7 @@ const fs = require('fs')
 const asnMMDB = path.join(__dirname, '..', 'mmdb', 'GeoLite2-ASN.mmdb')
 const ispMMDB = path.join(__dirname, '..', 'mmdb', 'GeoIP2-ISP.mmdb')
 const connectionTypeMMDB = path.join(__dirname, '..', 'mmdb', 'GeoIP2-Connection-Type.mmdb')
+const anonymousPlusMMDB = path.join(__dirname, '..', 'mmdb', 'GeoIP-Anonymous-Plus.mmdb')
 
 class WrkUtilNetApi extends WrkApi {
   constructor (conf, ctx) {
@@ -41,6 +42,7 @@ class WrkUtilNetApi extends WrkApi {
         ctx.geoIp = this.geoIp
         ctx.ispDb = this.ispDb
         ctx.connectionTypeDb = this.connectionTypeDb
+        ctx.anonymousPlusDb = this.anonymousPlusDb
         ctx.conf = ctx.conf || {}
         _.extend(ctx.conf, {
           maxAccuracyRadius: this.conf.util.maxAccuracyRadius
@@ -94,6 +96,14 @@ class WrkUtilNetApi extends WrkApi {
         }
       })
 
+      this.anonymousPlusDb = await maxmind.open(anonymousPlusMMDB, {
+        watchForUpdates: true,
+        watchForUpdatesNonPersistent: true,
+        watchForUpdatesHook: () => {
+          process.stdout.write('Anonymous plus database has been reloaded\n')
+        }
+      })
+
       this.geoIp.startWatchingDataUpdate((err) => {
         if (err instanceof Error) {
           process.stderr.write(`ERR: ${err.message}\n`)
@@ -126,6 +136,10 @@ class WrkUtilNetApi extends WrkApi {
 
     if (!fs.existsSync(connectionTypeMMDB)) {
       throw new Error('CONNECTION_TYPE_DB_NOT_INSTALLED - run `npm run update-connection-type-data`')
+    }
+
+    if (!fs.existsSync(anonymousPlusMMDB)) {
+      throw new Error('ANONYMOUS_PLUS_DB_NOT_INSTALLED - run `npm run update-anonymous-plus-data`')
     }
   }
 }

@@ -24,6 +24,14 @@ Changes should go through the base project and merged from upstream, if applicab
 bash setup-config.sh
 ```
 
+### Testing
+
+Configure mmdb databases with `scp -r your.username@developers.bitfinex.com:~/shared/bfx-util-net-js/mmdb .`
+
+```shell
+npm run test
+```
+
 ### Grapes
 
 Run two Grapes:
@@ -36,8 +44,8 @@ grape --dp 20002 --aph 40001 --bn '127.0.0.1:20001'
 ### Update Geo/ASN data
 
 First, export your license key, for staging/prod we have a comercial
-license.  For dev, you can get a free key key optained through 
-https://dev.maxmind.com/geoip/geolite2-free-geolocation-data?lang=en 
+license. For dev, you can get a free key key optained through
+https://dev.maxmind.com/geoip/geolite2-free-geolocation-data?lang=en
 
 export MAXMIND_LICENSE='your secret license'
 
@@ -46,13 +54,13 @@ npm run update-geo-data
 npm run update-asn-data
 npm run update-isp-data
 npm run update-connection-type-data
+npm run update-anonymous-plus-data
 ```
 
 ### Periodic Updates for Geo/ASN data
 
 Update geo-data at midnight every three days with cron.
 Update geo-data at 23:00 every three days with cron.
-
 
 Let's assume the path to the deployed service is `/opt/var/bfx-util-net`.
 
@@ -78,22 +86,25 @@ To turn on ACL and SSL set up, copy `sec-test` to `sec`:
 cp -R sec-test sec
 ```
 
-Set access rules in [sec/acl.json](https://github.com/bitfinexcom/bfx-util-net-js/blob/8d07c144f3a4135db0d4c7bc51297ffc06e358f9/sec-test/acl.json)
+Set access rules
+in [sec/acl.json](https://github.com/bitfinexcom/bfx-util-net-js/blob/8d07c144f3a4135db0d4c7bc51297ffc06e358f9/sec-test/acl.json)
 
-Access is logged to [sec/acl.log](https://github.com/bitfinexcom/bfx-util-net-js/blob/8d07c144f3a4135db0d4c7bc51297ffc06e358f9/sec-test/acl.log).
+Access is logged
+to [sec/acl.log](https://github.com/bitfinexcom/bfx-util-net-js/blob/8d07c144f3a4135db0d4c7bc51297ffc06e358f9/sec-test/acl.log).
 
-To use SSL in `example.js`, uncomment everything related to SSL: https://github.com/bitfinexcom/bfx-util-net-js/blob/8d07c144f3a4135db0d4c7bc51297ffc06e358f9/example.js#L16.L24
+To use SSL in `example.js`, uncomment everything related to
+SSL: https://github.com/bitfinexcom/bfx-util-net-js/blob/8d07c144f3a4135db0d4c7bc51297ffc06e358f9/example.js#L16.L24
 
 ## Grenache API
 
 ### action: 'getIpInfo'
 
-  - `args`: &lt;Array&gt;
+- `args`: &lt;Array&gt;
     - `0`: &lt;String&gt; IP to lookup
 
 **Response:**
 
-  - &lt;Array&gt;
+- &lt;Array&gt;
     - 0 &lt;String&gt; Ip that was looked up
     - 1 &lt;Object&gt; Result: geo, dns
 
@@ -131,87 +142,92 @@ To use SSL in `example.js`, uncomment everything related to SSL: https://github.
 
 ### action: 'getIpAsn'
 
-  - `args`: &lt;Array&gt;
+- `args`: &lt;Array&gt;
     - `0`: &lt;String&gt; IP to lookup
 
 **Response:**
 
-  - &lt;Array&gt;
+- &lt;Array&gt;
     - 0 &lt;String&gt; Ip that was looked up
     - 1 &lt;Object&gt; ASN information
 
- **Example Response:**
+**Example Response:**
 
 ```js
-[ '8.8.8.8',
-  { autonomous_system_number: 15169,
-    autonomous_system_organization: 'Google Inc.' } ]
+['8.8.8.8',
+  {
+    autonomous_system_number: 15169,
+    autonomous_system_organization: 'Google Inc.'
+  }]
 ```
 
 ### action: 'getReverseDns'
 
-
-  - `args`: &lt;Array&gt;
+- `args`: &lt;Array&gt;
     - `0`: &lt;String&gt; IP to lookup
 
 **Response:**
 
-  - &lt;Array&gt;
+- &lt;Array&gt;
     - 0 &lt;String&gt; Ip that was looked up
     - 1 &lt;Array&gt; hostnames
 
 **Example Response:**
 
 ```js
-[ '8.8.8.8', [ 'google-public-dns-a.google.com' ] ]
+['8.8.8.8', ['google-public-dns-a.google.com']]
 ```
 
 ### action: 'getIpGeo'
 
-  - `args`: &lt;Array&gt;
+- `args`: &lt;Array&gt;
     - `0`: &lt;String&gt; IP to lookup
 
 **Response:**
 
-  - &lt;Array&gt;
+- &lt;Array&gt;
     - 0 &lt;String&gt; Ip that was looked up
     - 1 &lt;Object&gt; Result: range, country, region, city, ll, metro, zip
 
 **Example Response:**
 
 ```js
-[ '53.1.34.21',
-  { range: [ 889192448, 897238054 ],
+['53.1.34.21',
+  {
+    range: [889192448, 897238054],
     country: 'DE',
     region: '',
     city: '',
-    ll: [ 51.2993, 9.491 ],
+    ll: [51.2993, 9.491],
     metro: 0,
-    zip: 0 } ]
+    zip: 0
+  }]
 ```
 
 ### action: 'getIpGeoBatch'
 
-  - `args`: &lt;Array&gt;
+- `args`: &lt;Array&gt;
     - `0`: &lt;Array&gt; IPs to lookup
 
 **Response:**
 
-  - &lt;Array&gt;
+- &lt;Array&gt;
     - 0 &lt;String&gt; Ip that was looked up
     - 1 &lt;Array&gt; Result array
 
 **Example Response:**
 
 ```js
-[ '53.1.34.21',
-  { range: [ 889192448, 897238054 ],
+['53.1.34.21',
+  {
+    range: [889192448, 897238054],
     country: 'DE',
     region: '',
     city: '',
-    ll: [ 51.2993, 9.491 ],
+    ll: [51.2993, 9.491],
     metro: 0,
-    zip: 0 } ]
+    zip: 0
+  }]
 ```
 
 #### Example

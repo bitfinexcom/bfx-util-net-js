@@ -109,26 +109,68 @@ describe('RPC integration', () => {
     })
   }).timeout(7000)
 
-  it('getIpInfo: all ip info endpoint (external)', (done) => {
-    const query = {
+  it('getIpInfo: all ip info endpoint (external)', async () => {
+    const ip = '8.8.8.8'
+
+    const data = await client.request({
       action: 'getIpInfo',
-      args: ['8.8.8.8']
-    }
+      args: [ip]
+    })
 
-    client.request(query, (err, data) => {
-      try {
-        if (err) throw err
-        assert.strictEqual(data[0], '8.8.8.8')
-        assert.ok(data[1].geo)
-        assert.ok(data[1].dns)
-        assert.ok(data[1].asn)
-        assert.ok(data[1].isp)
-        assert.ok(data[1].connectionType)
+    assert.strictEqual(data[0], ip)
+    assert.ok(data[1].geo)
+    assert.ok(data[1].dns)
+    assert.ok(data[1].asn)
+    assert.ok(data[1].isp)
+    assert.ok(data[1].connectionType)
+    assert.deepEqual(data[1].anonymousPlus, {})
+  }).timeout(7000)
 
-        done()
-      } catch (err) {
-        done(err)
-      }
+  it('getIpInfo: for a residential proxy (external)', async () => {
+    const ip = '121.43.154.123'
+
+    const data = await client.request({
+      action: 'getIpInfo',
+      args: [ip]
+    })
+
+    assert.deepEqual(data[0], ip)
+    assert.deepEqual(data[1].geo, {
+      range: [
+        2032861184,
+        2032926719
+      ],
+      country: 'CN',
+      region: 'ZJ',
+      eu: '0',
+      timezone: 'Asia/Shanghai',
+      city: 'Hangzhou',
+      ll: [
+        30.2943,
+        120.1663
+      ],
+      metro: 0,
+      area: 20,
+      confidenceScore: 0.96
+    })
+    assert.deepEqual(data[1].dns, null)
+    assert.deepEqual(data[1].asn, {
+      autonomous_system_number: 37963,
+      autonomous_system_organization: 'Hangzhou Alibaba Advertising Co.,Ltd.'
+    })
+    assert.deepEqual(data[1].isp, {
+      autonomous_system_number: 37963,
+      autonomous_system_organization: 'Hangzhou Alibaba Advertising Co.,Ltd.',
+      isp: 'Hangzhou Alibaba Advertising',
+      organization: 'Hangzhou Alibaba Advertising'
+    })
+    assert.deepEqual(data[1].connectionType, {
+      connection_type: 'Corporate'
+    })
+    assert.deepEqual(data[1].anonymousPlus, {
+      is_anonymous: true,
+      is_public_proxy: true,
+      anonymizer_confidence: 1
     })
   }).timeout(7000)
 
@@ -156,6 +198,7 @@ describe('RPC integration', () => {
     })
   }).timeout(7000)
 
+  // TODO fix this test using real cached data and proper assertions
   it('getIpInfoCached: second call gets all ip info endpoint (cached)', (done) => {
     const query = {
       action: 'getIpInfoCached',
@@ -242,7 +285,7 @@ describe('RPC integration', () => {
         )
 
         const res = data[1]
-        assert.strictEqual(res.connection_type, 'Cable/DSL')
+        assert.strictEqual(res.connection_type, 'Corporate')
         done()
       } catch (err) {
         done(err)
@@ -299,4 +342,6 @@ describe('RPC integration', () => {
       }
     })
   }).timeout(7000)
+
+  // TODO getIpAnonymousPlus
 })
