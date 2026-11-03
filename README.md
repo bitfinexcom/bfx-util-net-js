@@ -231,3 +231,7 @@ To use SSL in `example.js`, uncomment everything related to SSL: https://github.
     console.log(data)
   })
 ```
+
+## Node and package manager
+
+Use Node 22 and npm 12.2.1. Install with `npm ci --allow-git=all --ignore-scripts`. npm 12 honors disabled lifecycle scripts for Git dependencies. Run `npm test` after provisioning the required licensed MaxMind databases.

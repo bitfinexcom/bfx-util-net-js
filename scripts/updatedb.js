@@ -7,6 +7,7 @@
 //
 //  1. eslint disabled
 //  2. GeoLite2 -> GeoIP2  (premium, more accurate date w/ premium license)
+//  3. Use the ip-address native BigInt API
 //
 /* eslint-disable */
 
@@ -396,8 +397,8 @@ async function processCountryData(src, dest) {
 				bsz = 10;
 
 				rngip = new Address4(fields[0]);
-				sip = parseInt(rngip.startAddress().bigInteger(),10);
-				eip = parseInt(rngip.endAddress().bigInteger(),10);
+				sip = Number(rngip.startAddress().bigInt());
+				eip = Number(rngip.endAddress().bigInt());
 	
 				b = Buffer.alloc(bsz);
 				b.fill(0);
@@ -506,8 +507,8 @@ async function processCityData(src, dest) {
 			bsz = 24;
 
 			rngip = new Address4(fields[0]);
-			sip = parseInt(rngip.startAddress().bigInteger(),10);
-			eip = parseInt(rngip.endAddress().bigInteger(),10);
+			sip = Number(rngip.startAddress().bigInt());
+			eip = Number(rngip.endAddress().bigInt());
 			locId = parseInt(fields[1], 10);
 			locId = cityLookup[locId];
 			b = Buffer.alloc(bsz);

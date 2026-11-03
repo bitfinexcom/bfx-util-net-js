@@ -8,7 +8,7 @@ const _ = require('lodash')
 global.geodatadir = path.join(__dirname, '../data')
 const maxmind = require('maxmind')
 
-const { WrkApi } = require('bfx-wrk-api')
+const { WrkApi } = require('@bitfinex/bfx-wrk-api')
 const geoIp = require('geoip-lite')
 const fs = require('fs')
 
@@ -56,7 +56,7 @@ class WrkUtilNetApi extends WrkApi {
     this.testIfDbExists()
 
     this.setInitFacs([
-      ['fac', 'bfx-facs-lru', '0', '0', { maxAge: 86400 * 30 * 1000 }]
+      ['fac', '@bitfinex/bfx-facs-lru', '0', '0', { maxAge: 86400 * 30 * 1000 }]
     ])
   }
 

@@ -5,9 +5,9 @@
 const assert = require('assert')
 const path = require('path')
 
-const createGrapes = require('bfx-svc-test-helper/grapes')
-const createWorker = require('bfx-svc-test-helper/worker')
-const createClient = require('bfx-svc-test-helper/client')
+const createGrapes = require('@bitfinex/bfx-svc-test-helper/grapes')
+const createWorker = require('@bitfinex/bfx-svc-test-helper/worker')
+const createClient = require('@bitfinex/bfx-svc-test-helper/client')
 
 let grapes, worker, client
 describe('RPC integration', () => {

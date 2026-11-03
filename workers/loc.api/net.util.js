@@ -3,7 +3,7 @@
 const _ = require('lodash')
 const dns = require('dns').promises
 
-const { Api } = require('bfx-wrk-api')
+const { Api } = require('@bitfinex/bfx-wrk-api')
 
 class UtilNet extends Api {
   space (service, msg) {
