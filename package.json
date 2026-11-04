@@ -29,7 +29,7 @@
     "lazy": "1.0.11",
     "lodash": "4.18.1",
     "maxmind": "4.3.28",
-    "rimraf": "3.0.2",
+    "rimraf": "6.1.4",
     "yauzl": "2.10.0"
   },
   "devDependencies": {
@@ -55,7 +55,18 @@
   "packageManager": "npm@12.2.1",
   "overrides": {
     "geoip-lite": {
-      "ip-address": "10.7.5"
+      "ip-address": "10.7.5",
+      "rimraf": "6.1.4"
+    },
+    "mocha": {
+      "glob": "14.0.2",
+      "minimatch": "11.0.1"
+    },
+    "grenache-nodejs-base": {
+      "uuid": "11.1.1"
+    },
+    "grenache-nodejs-link": {
+      "uuid": "11.1.1"
     }
   }
 }
