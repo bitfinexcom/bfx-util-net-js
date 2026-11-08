@@ -1,6 +1,6 @@
 {
   "name": "bfx-util-net-js",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Bitfinex Service",
   "author": "Robert Kowalski <robert@bitfinex.com>",
@@ -21,8 +21,8 @@
     "async": "^3.2.1",
     "chalk": "4.1.2",
     "geoip-lite": "1.4.10",
-    "grenache-nodejs-http": "1.0.2",
-    "grenache-nodejs-link": "1.0.2",
+    "grenache-nodejs-http": "git+https://github.com/bitfinexcom/grenache-nodejs-http#v2.0.0",
+    "grenache-nodejs-link": "git+https://github.com/bitfinexcom/grenache-nodejs-link#v2.0.0",
     "https-proxy-agent": "5.0.0",
     "iconv-lite": "0.6.3",
     "ip-address": "10.7.5",
@@ -61,12 +61,6 @@
     "mocha": {
       "glob": "14.0.2",
       "minimatch": "11.0.1"
-    },
-    "grenache-nodejs-base": {
-      "uuid": "11.1.1"
-    },
-    "grenache-nodejs-link": {
-      "uuid": "11.1.1"
-    }
-  }
+    } 
+ }
 }
