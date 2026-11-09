@@ -1,14 +1,13 @@
 'use strict'
 
 const path = require('path')
-const _ = require('lodash')
 // It looks like in the next release of geoip-lite
 // we can use GEODATADIR env instead of this gloabl env var,
 // but w/out it maxmind reads old data from in node_modules
 global.geodatadir = path.join(__dirname, '../data')
 const maxmind = require('maxmind')
 
-const { WrkApi } = require('bfx-wrk-api')
+const { WrkApi } = require('@bitfinex/bfx-wrk-api')
 const geoIp = require('geoip-lite')
 const fs = require('fs')
 
@@ -42,7 +41,7 @@ class WrkUtilNetApi extends WrkApi {
         ctx.ispDb = this.ispDb
         ctx.connectionTypeDb = this.connectionTypeDb
         ctx.conf = ctx.conf || {}
-        _.extend(ctx.conf, {
+        Object.assign(ctx.conf, {
           maxAccuracyRadius: this.conf.util.maxAccuracyRadius
         })
         break
@@ -56,7 +55,7 @@ class WrkUtilNetApi extends WrkApi {
     this.testIfDbExists()
 
     this.setInitFacs([
-      ['fac', 'bfx-facs-lru', '0', '0', { maxAge: 86400 * 30 * 1000 }]
+      ['fac', '@bitfinex/bfx-facs-lru', '0', '0', { maxAge: 86400 * 30 * 1000 }]
     ])
   }
 

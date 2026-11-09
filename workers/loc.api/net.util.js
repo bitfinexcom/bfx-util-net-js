@@ -1,9 +1,8 @@
 'use strict'
 
-const _ = require('lodash')
 const dns = require('dns').promises
 
-const { Api } = require('bfx-wrk-api')
+const { Api } = require('@bitfinex/bfx-wrk-api')
 
 class UtilNet extends Api {
   space (service, msg) {
@@ -77,7 +76,7 @@ class UtilNet extends Api {
   }
 
   getIpGeoBatch (space, ips, cb) {
-    if (!_.isArray(ips)) {
+    if (!Array.isArray(ips)) {
       return cb(new Error('ERR_API_INPUT_INVALID'))
     }
 
