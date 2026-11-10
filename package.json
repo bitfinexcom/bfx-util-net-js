@@ -15,14 +15,14 @@
     "lint:fix": "bfx-lint-js . --mocha --fix"
   },
   "dependencies": {
-    "@bitfinex/bfx-facs-lru": "git+https://github.com/bitfinexcom/bfx-facs-lru.git",
-    "@bitfinex/bfx-svc-boot-js": "git+https://github.com/bitfinexcom/bfx-svc-boot-js.git",
-    "@bitfinex/bfx-wrk-api": "git+https://github.com/bitfinexcom/bfx-wrk-api.git",
+    "@bitfinex/bfx-facs-lru": "git+https://github.com/bitfinexcom/bfx-facs-lru.git#v2.0.0",
+    "@bitfinex/bfx-svc-boot-js": "git+https://github.com/bitfinexcom/bfx-svc-boot-js.git#v2.0.0",
+    "@bitfinex/bfx-wrk-api": "git+https://github.com/bitfinexcom/bfx-wrk-api.git#v1.1.0",
     "async": "^3.2.1",
     "chalk": "4.1.2",
     "geoip-lite": "1.4.10",
-    "grenache-nodejs-http": "git+https://github.com/bitfinexcom/grenache-nodejs-http#v2.0.0",
-    "grenache-nodejs-link": "git+https://github.com/bitfinexcom/grenache-nodejs-link#v2.0.0",
+    "grenache-nodejs-http": "git+https://github.com/bitfinexcom/grenache-nodejs-http#v2.0.2",
+    "grenache-nodejs-link": "git+https://github.com/bitfinexcom/grenache-nodejs-link#v2.0.2",
     "https-proxy-agent": "5.0.0",
     "iconv-lite": "0.6.3",
     "ip-address": "10.7.5",
@@ -33,7 +33,7 @@
     "yauzl": "2.10.0"
   },
   "devDependencies": {
-    "@bitfinex/bfx-svc-test-helper": "git+https://github.com/bitfinexcom/bfx-svc-test-helper.git",
+    "@bitfinex/bfx-svc-test-helper": "git+https://github.com/bitfinexcom/bfx-svc-test-helper.git#v2.0.2",
     "@bitfinex/lint-js": "1.1.0",
     "grenache-grape": "1.0.0",
     "mocha": "12.0.3"
