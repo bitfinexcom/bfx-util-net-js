@@ -7,6 +7,7 @@
 //
 //  1. eslint disabled
 //  2. GeoLite2 -> GeoIP2  (premium, more accurate date w/ premium license)
+//  3. Fixing potential security issue
 //
 /* eslint-disable */
 
@@ -125,28 +126,87 @@ function try_fixing_line(line) {
 	return line;
 }
 
-function CSVtoArray(text) {
-	var re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
-	var re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
-	// Return NULL if input string is not well formed CSV string.
-	if (!re_valid.test(text)){
-		text  = try_fixing_line(text);
-		if(!re_valid.test(text))
-			return null;
+function parseCSVLine(text) {
+	var fields = [];
+	var i = 0;
+	var len = text.length;
+
+	while (i < len) {
+		// Skip leading whitespace.
+		while (i < len && /\s/.test(text[i])) i++;
+
+		var quote = text[i] === "'" || text[i] === '"'
+			? text[i++]
+			: null;
+
+		var value = '';
+
+		if (quote) {
+			var closed = false;
+
+			while (i < len) {
+				var char = text[i++];
+
+				if (char === '\\') {
+					if (i >= len) return null;
+
+					var escaped = text[i++];
+
+					value += '\\' + escaped;
+				} else if (char === quote) {
+					closed = true;
+					break;
+				} else {
+					value += char;
+				}
+			}
+
+			if (!closed) return null;
+
+			// Only whitespace or a comma may follow a quoted value.
+			while (i < len && /\s/.test(text[i])) i++;
+
+			if (i < len && text[i] !== ',') return null;
+
+			value = value
+				.replace(/\\'/g, "'")
+				.replace(/\\"/g, '"');
+		} else {
+			var start = i;
+
+			while (i < len && text[i] !== ',') {
+				if (text[i] === '"' || text[i] === "'" || text[i] === '\\') {
+					return null;
+				}
+
+				i++;
+			}
+
+			value = text.slice(start, i).trim();
+		}
+
+		fields.push(value);
+
+		if (i < len) {
+			i++; // Skip comma.
+
+			if (i === len) {
+				fields.push('');
+			}
+		}
 	}
-	var a = []; // Initialize array to receive values.
-	text.replace(re_value, // "Walk" the string using replace with callback.
-		function(m0, m1, m2, m3) {
-			// Remove backslash from \' in single quoted values.
-			if      (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
-			// Remove backslash from \" in double quoted values.
-			else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"').replace(/\\'/g, "'"));
-			else if (m3 !== undefined) a.push(m3);
-			return ''; // Return empty string.
-		});
-	// Handle special case of empty last value.
-	if (/,\s*$/.test(text)) a.push('');
-	return a;
+
+	return fields;
+}
+
+function CSVtoArray(text) {
+	var result = parseCSVLine(text);
+
+	if (result === null) {
+		result = parseCSVLine(try_fixing_line(text));
+	}
+
+	return result;
 }
 
 function getHTTPOptions(downloadUrl) {
