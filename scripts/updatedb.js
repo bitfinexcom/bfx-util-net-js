@@ -28,7 +28,6 @@ var readline = require('readline');
 fs.existsSync = fs.existsSync || path.existsSync;
 
 var async = require('async');
-var chalk = require('chalk');
 var iconv = require('iconv-lite');
 var lazy = require('lazy');
 var rimraf = require('rimraf').sync;
@@ -54,7 +53,7 @@ var dataPath = path.resolve(__dirname, '..', 'data');
 if (typeof geodatadir !== 'undefined') {
 	dataPath = path.resolve(process.cwd(), geodatadir.split('=')[1]);
 	if (!fs.existsSync(dataPath)) {
-		console.log(chalk.red('ERROR') + ': Directory does\'t exist: ' + dataPath);
+		console.error(`Directory does't exist: ${dataPath}`);
 		process.exit(1);
 	}
 }
@@ -257,7 +256,7 @@ function check(database, cb) {
 			if(status === 301 || status === 302 || status === 303 || status === 307 || status === 308) {
 				return https.get(getHTTPOptions(response.headers.location), onResponse);
 			} else if (status !== 200) {
-				console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
+				console.error(`HTTP Request Failed [${status} ${http.STATUS_CODES[status]}]`);
 				client.abort();
 				process.exit(1);
 			}
@@ -270,16 +269,16 @@ function check(database, cb) {
 			response.on("end", function () {
 				if (str && str.length) {
 					if (str == database.checkValue) {
-						console.log(chalk.green('Database "' + database.type + '" is up to date'));
+						console.log(`Database "${database.type}" is up to date`);
 						database.skip = true;
 					}
 					else {
-						console.log(chalk.green('Database ' + database.type + ' has new data'));
+						console.log(`Database ${database.type} has new data`);
 						database.checkValue = str;
 					}
 				}
 				else {
-					console.log(chalk.red('ERROR') + ': Could not retrieve checksum for', database.type, chalk.red('Aborting'));
+					console.error(`Could not retrieve checksum for ${database.type} Aborting`);
 					console.log('Run with "force" to update without checksum');
 					client.abort();
 					process.exit(1);
@@ -320,7 +319,7 @@ function fetch(database, cb) {
 		if(status === 301 || status === 302 || status === 303 || status === 307 || status === 308) {
 			return https.get(getHTTPOptions(response.headers.location), onResponse);
 		} else if (status !== 200) {
-			console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
+			console.error(`HTTP Request Failed [${status} ${http.STATUS_CODES[status]}]`);
 			client.abort();
 			process.exit(1);
 		}
@@ -335,7 +334,7 @@ function fetch(database, cb) {
 		}
 
 		tmpFilePipe.on('close', function() {
-			console.log(chalk.green(' DONE'));
+			console.log('DONE');
 			cb(null, tmpFile, fileName, database);
 		});
 	}
@@ -384,7 +383,7 @@ function extract(tmpFile, tmpFileName, database, cb) {
 				}
 			});
 			zipfile.once("end", function() {
-				console.log(chalk.green(' DONE'));
+				console.log('DONE');
 				cb(null, database);
 			});
 		});
@@ -412,7 +411,7 @@ function processLookupCountry(src, cb){
 		.skip(1)
 		.map(processLine)
 		.on('pipe', function() {
-			console.log(chalk.green(' DONE'));
+			console.log('DONE');
 			cb();
 		});
 }
@@ -502,7 +501,7 @@ async function processCountryData(src, dest) {
 		await processLine(line);
 	}
 	datFile.close();
-	console.log(chalk.green(' DONE'));
+	console.log('DONE');
 }
 
 async function processCityData(src, dest) {
@@ -711,7 +710,7 @@ function processData(database, cb) {
 				console.log("city data processed");
 				return processCityData(src[2], dest[2]);
 			}).then(() => {
-				console.log(chalk.green(' DONE'));
+				console.log('DONE');
 				cb(null, database);
 			});
 		});
@@ -724,13 +723,13 @@ function updateChecksum(database, cb) {
 		return cb();
 	}
 	fs.writeFile(path.join(dataPath, database.type+".checksum"), database.checkValue, 'utf8', function(err){
-		if (err) console.log(chalk.red('Failed to Update checksums.'), "Database:", database.type);
+		if (err) console.error(`Failed to Update checksums. Database ${database.type}`);
 		cb();
 	});
 }
 
 if (!license_key) {
-	console.log(chalk.red('ERROR') + ': Missing license_key');
+	console.error('Missing license_key');
 	process.exit(1);
 }
 
@@ -743,12 +742,12 @@ async.eachSeries(databases, function(database, nextDatabase) {
 
 }, function(err) {
 	if (err) {
-		console.log(chalk.red('Failed to Update Databases from MaxMind.'), err);
+		console.error('Failed to Update Databases from MaxMind.', err);
 		process.exit(1);
 	} else {
-		console.log(chalk.green('Successfully Updated Databases from MaxMind.'));
+		console.log('Successfully Updated Databases from MaxMind.');
 		if (args.indexOf("debug") !== -1) {
-			console.log(chalk.yellow.bold('Notice: temporary files are not deleted for debug purposes.'));
+			console.warn('Notice: temporary files are not deleted for debug purposes.');
 		} else {
 			rimraf(tmpPath);
 		}
