@@ -7,6 +7,7 @@
 //
 //  1. eslint disabled
 //  2. GeoLite2 -> GeoIP2  (premium, more accurate date w/ premium license)
+//  3. Fixing potential security issue
 //
 /* eslint-disable */
 
@@ -111,7 +112,7 @@ function try_fixing_line(line) {
 	var pos2 = -1;
 	// escape quotes
 	line = line.replace(/""/,'\\"').replace(/'/g,"\\'");
-	
+
 	while(pos1 < line.length && pos2 < line.length) {
 		pos1 = pos2;
 		pos2 = line.indexOf(',', pos1 + 1);
@@ -125,28 +126,87 @@ function try_fixing_line(line) {
 	return line;
 }
 
-function CSVtoArray(text) {
-	var re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
-	var re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
-	// Return NULL if input string is not well formed CSV string.
-	if (!re_valid.test(text)){
-		text  = try_fixing_line(text);
-		if(!re_valid.test(text))
-			return null;
+function parseCSVLine(text) {
+	var fields = [];
+	var i = 0;
+	var len = text.length;
+
+	while (i < len) {
+		// Skip leading whitespace.
+		while (i < len && /\s/.test(text[i])) i++;
+
+		var quote = text[i] === "'" || text[i] === '"'
+			? text[i++]
+			: null;
+
+		var value = '';
+
+		if (quote) {
+			var closed = false;
+
+			while (i < len) {
+				var char = text[i++];
+
+				if (char === '\\') {
+					if (i >= len) return null;
+
+					var escaped = text[i++];
+
+					value += '\\' + escaped;
+				} else if (char === quote) {
+					closed = true;
+					break;
+				} else {
+					value += char;
+				}
+			}
+
+			if (!closed) return null;
+
+			// Only whitespace or a comma may follow a quoted value.
+			while (i < len && /\s/.test(text[i])) i++;
+
+			if (i < len && text[i] !== ',') return null;
+
+			value = value
+				.replace(/\\'/g, "'")
+				.replace(/\\"/g, '"');
+		} else {
+			var start = i;
+
+			while (i < len && text[i] !== ',') {
+				if (text[i] === '"' || text[i] === "'" || text[i] === '\\') {
+					return null;
+				}
+
+				i++;
+			}
+
+			value = text.slice(start, i).trim();
+		}
+
+		fields.push(value);
+
+		if (i < len) {
+			i++; // Skip comma.
+
+			if (i === len) {
+				fields.push('');
+			}
+		}
 	}
-	var a = []; // Initialize array to receive values.
-	text.replace(re_value, // "Walk" the string using replace with callback.
-		function(m0, m1, m2, m3) {
-			// Remove backslash from \' in single quoted values.
-			if      (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
-			// Remove backslash from \" in double quoted values.
-			else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"').replace(/\\'/g, "'"));
-			else if (m3 !== undefined) a.push(m3);
-			return ''; // Return empty string.
-		});
-	// Handle special case of empty last value.
-	if (/,\s*$/.test(text)) a.push('');
-	return a;
+
+	return fields;
+}
+
+function CSVtoArray(text) {
+	var result = parseCSVLine(text);
+
+	if (result === null) {
+		result = parseCSVLine(try_fixing_line(text));
+	}
+
+	return result;
 }
 
 function getHTTPOptions(downloadUrl) {
@@ -175,22 +235,22 @@ function check(database, cb) {
 		//so not even using checksums
 		return cb(null, database);
 	}
-	
+
 	var checksumUrl = database.checksum;
-    
+
 	if (typeof checksumUrl === "undefined") {
 		//no checksum url to check, skipping
 		return cb(null, database);
 	}
-    
+
 	//read existing checksum file
 	fs.readFile(path.join(dataPath, database.type+".checksum"), {encoding: 'utf8'}, function(err, data) {
 		if (!err && data && data.length) {
 			database.checkValue = data;
 		}
-		
+
 		console.log('Checking ', database.fileName);
-        
+
 		function onResponse(response) {
 			var status = response.statusCode;
 
@@ -201,12 +261,12 @@ function check(database, cb) {
 				client.abort();
 				process.exit(1);
 			}
-    
+
 			var str = "";
 			response.on("data", function (chunk) {
 				str += chunk;
 			});
-            
+
 			response.on("end", function () {
 				if (str && str.length) {
 					if (str == database.checkValue) {
@@ -227,13 +287,13 @@ function check(database, cb) {
 				cb(null, database);
 			});
 		}
-        
+
 		var client = https.get(getHTTPOptions(checksumUrl), onResponse);
 	});
 }
 
 function fetch(database, cb) {
-    
+
 	if (database.skip) {
 		return cb(null, null, null, database);
 	}
@@ -291,7 +351,7 @@ function extract(tmpFile, tmpFileName, database, cb) {
 	if (database.skip) {
 		return cb(null, database);
 	}
-	
+
 	if (path.extname(tmpFileName) !== '.zip') {
 		cb(null, database);
 	} else {
@@ -318,7 +378,7 @@ function extract(tmpFile, tmpFileName, database, cb) {
 						});
 						var filePath = entry.fileName.split("/");
 						// filePath will always have length >= 1, as split() always returns an array of at least one string
-						var fileName = filePath[filePath.length - 1]; 
+						var fileName = filePath[filePath.length - 1];
 						readStream.pipe(fs.createWriteStream(path.join(tmpPath, fileName)));
 					});
 				}
@@ -382,12 +442,12 @@ async function processCountryData(src, dest) {
 				rngip = new Address6(fields[0]);
 				sip = utils.aton6(rngip.startAddress().correctForm());
 				eip = utils.aton6(rngip.endAddress().correctForm());
-	
+
 				b = Buffer.alloc(bsz);
 				for (i = 0; i < sip.length; i++) {
 					b.writeUInt32BE(sip[i], i * 4);
 				}
-	
+
 				for (i = 0; i < eip.length; i++) {
 					b.writeUInt32BE(eip[i], 16 + (i * 4));
 				}
@@ -396,15 +456,15 @@ async function processCountryData(src, dest) {
 				bsz = 10;
 
 				rngip = new Address4(fields[0]);
-				sip = parseInt(rngip.startAddress().bigInteger(),10);
-				eip = parseInt(rngip.endAddress().bigInteger(),10);
-	
+				sip = parseInt(rngip.startAddress().bigInt(),10);
+				eip = parseInt(rngip.endAddress().bigInt(),10);
+
 				b = Buffer.alloc(bsz);
 				b.fill(0);
 				b.writeUInt32BE(sip, 0);
 				b.writeUInt32BE(eip, 4);
 			}
-	
+
 			b.write(cc, bsz - 2);
 			if(Date.now() - tstart > 5000) {
 				tstart = Date.now();
@@ -494,7 +554,7 @@ async function processCityData(src, dest) {
 				offset += 4;
 			}
 			b.writeUInt32BE(locId>>>0, 32);
-			
+
 			lat = Math.round(parseFloat(fields[7]) * 10000);
 			lon = Math.round(parseFloat(fields[8]) * 10000);
 			area = parseInt(fields[9], 10);
@@ -506,8 +566,8 @@ async function processCityData(src, dest) {
 			bsz = 24;
 
 			rngip = new Address4(fields[0]);
-			sip = parseInt(rngip.startAddress().bigInteger(),10);
-			eip = parseInt(rngip.endAddress().bigInteger(),10);
+			sip = parseInt(rngip.startAddress().bigInt(),10);
+			eip = parseInt(rngip.endAddress().bigInt(),10);
 			locId = parseInt(fields[1], 10);
 			locId = cityLookup[locId];
 			b = Buffer.alloc(bsz);
@@ -576,7 +636,7 @@ function processCityDataNames(src, dest, cb) {
 			console.log("weird line: %s::", line);
 			return;
 		}
-		
+
 		locId = parseInt(fields[0]);
 
 		cityLookup[locId] = linesCount;
@@ -625,7 +685,7 @@ function processData(database, cb) {
 	if (database.skip) {
 		return cb(null, database);
 	}
-    
+
 	var type = database.type;
 	var src = database.src;
 	var dest = database.dest;
