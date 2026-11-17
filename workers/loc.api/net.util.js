@@ -5,16 +5,12 @@ const dns = require('dns').promises
 const { Api } = require('@bitfinex/bfx-wrk-api')
 
 class UtilNet extends Api {
-  space (service, msg) {
-    const space = super.space(service, msg)
-    return space
-  }
-
   async getIpInfo (space, ip, cb) {
     const geoData = this._getGeoIp(ip)
     const asnData = this.ctx.asnDb.get(ip)
     const ispData = this.ctx.ispDb.get(ip)
     const connectionTypeData = this.ctx.connectionTypeDb.get(ip)
+    const anonymousPlusData = this.ctx.anonymousPlusDb.get(ip)
 
     let dnsData = null
     try {
@@ -29,7 +25,8 @@ class UtilNet extends Api {
         dns: dnsData,
         asn: asnData,
         isp: ispData,
-        connectionType: connectionTypeData
+        connectionType: connectionTypeData,
+        anonymousPlus: anonymousPlusData
       }
     ]
 
