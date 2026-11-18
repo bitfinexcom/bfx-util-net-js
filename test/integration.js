@@ -1,302 +1,191 @@
-/* eslint-env mocha */
-
 'use strict'
 
-const assert = require('assert')
-const path = require('path')
-
+const test = require('brittle')
 const createGrapes = require('@bitfinex/bfx-svc-test-helper/grapes')
 const createWorker = require('@bitfinex/bfx-svc-test-helper/worker')
 const createClient = require('@bitfinex/bfx-svc-test-helper/client')
+const path = require('path')
 
 let grapes, worker, client
-describe('RPC integration', () => {
-  before(async function () {
-    this.timeout(20000)
 
-    grapes = createGrapes()
-    await grapes.start()
+const before = async () => {
+  grapes = createGrapes()
+  await grapes.start()
 
-    worker = createWorker({
-      env: 'development',
-      wtype: 'wrk-util-net-api',
-      apiPort: 8721,
-      serviceRoot: path.join(__dirname, '..')
-    }, grapes)
+  worker = createWorker({
+    env: 'development',
+    wtype: 'wrk-util-net-api',
+    apiPort: 8721,
+    serviceRoot: path.join(__dirname, '..')
+  }, grapes)
 
-    await worker.start()
+  await worker.start()
 
-    client = createClient(worker)
-  })
+  client = createClient(worker)
+}
 
-  after(async function () {
-    this.timeout(5000)
+const after = async () => {
+  if (client) await client.stop()
+  if (worker) await worker.stop()
+  if (grapes) await grapes.stop()
+}
 
-    await client.stop()
-    await worker.stop()
-    await grapes.stop()
-  })
+const testCase = (testBlock) => async (t) => {
+  try {
+    await before()
+    await testBlock(t)
+  } finally {
+    await after()
+  }
+}
 
-  it('geo-ip: retrieves ips', (done) => {
+test('RPC integration', testCase(async (t) => {
+  await t.test('geo-ip: retrieves ips', async (t) => {
     const query = {
       action: 'getIpGeo',
       args: ['53.1.34.21']
     }
+    const data = await client.request(query)
 
-    client.request(query, (err, data) => {
-      try {
-        if (err) throw err
+    t.is(data[0], '53.1.34.21', 'result contains queried ip')
+    const res = data[1]
+    t.is(res.country, 'DE')
+  })
 
-        assert.strictEqual(
-          data[0], '53.1.34.21', 'result contains queried ip'
-        )
-
-        const res = data[1]
-        assert.strictEqual(res.country, 'DE')
-        done()
-      } catch (err) {
-        done(err)
-      }
-    })
-  }).timeout(7000)
-
-  it('geo-ip: supports batch lookups', (done) => {
+  await t.test('geo-ip: supports batch lookups', async (t) => {
     const batch = ['53.1.34.21', '53.2.34.21']
     const query = {
       action: 'getIpGeoBatch',
       args: [batch]
     }
+    const data = await client.request(query)
 
-    client.request(query, (err, data) => {
-      try {
-        if (err) throw err
-        assert.strictEqual(
-          data[0][0], '53.1.34.21', 'result contains queried ip'
-        )
-        assert.strictEqual(
-          data[1][0], '53.2.34.21', 'result contains queried ip'
-        )
+    t.is(data[0][0], '53.1.34.21', 'result contains queried ip')
+    t.is(data[1][0], '53.2.34.21', 'result contains queried ip')
+    t.is(data[0][1].country, 'DE')
+    t.is(data[1][1].country, 'DE')
+  })
 
-        assert.strictEqual(data[0][1].country, 'DE')
-        assert.strictEqual(data[1][1].country, 'DE')
-
-        done()
-      } catch (err) {
-        done(err)
-      }
-    })
-  }).timeout(7000)
-
-  it('reverse dns: retrieves ips (external)', (done) => {
+  await t.test('reverse dns: retrieves ips (external)', async (t) => {
     const query = {
       action: 'getReverseDns',
       args: ['8.8.8.8']
     }
+    const data = await client.request(query)
 
-    client.request(query, (err, data) => {
-      try {
-        if (err) throw err
+    t.is(data[0], '8.8.8.8')
+    t.is(data[1][0], 'dns.google')
+  })
 
-        assert.strictEqual(data[0], '8.8.8.8')
-        assert.strictEqual(
-          data[1][0], 'dns.google'
-        )
-
-        done()
-      } catch (err) {
-        done(err)
-      }
-    })
-  }).timeout(7000)
-
-  it('getIpInfo: all ip info endpoint (external)', (done) => {
+  await t.test('getIpInfo: all ip info endpoint (external)', async (t) => {
     const query = {
       action: 'getIpInfo',
       args: ['8.8.8.8']
     }
+    const data = await client.request(query)
 
-    client.request(query, (err, data) => {
-      try {
-        if (err) throw err
-        assert.strictEqual(data[0], '8.8.8.8')
-        assert.ok(data[1].geo)
-        assert.ok(data[1].dns)
-        assert.ok(data[1].asn)
-        assert.ok(data[1].isp)
-        assert.ok(data[1].connectionType)
+    t.is(data[0], '8.8.8.8')
+    t.ok(data[1].geo)
+    t.ok(data[1].dns)
+    t.ok(data[1].asn)
+    t.ok(data[1].isp)
+    t.ok(data[1].connectionType)
+  })
 
-        done()
-      } catch (err) {
-        done(err)
-      }
-    })
-  }).timeout(7000)
-
-  it('getIpInfoCached: all ip info endpoint (external)', (done) => {
+  await t.test('getIpInfoCached: all ip info endpoint (external)', async (t) => {
     const query = {
       action: 'getIpInfoCached',
       args: ['8.8.8.8']
     }
+    const data = await client.request(query)
 
-    client.request(query, (err, data) => {
-      try {
-        if (err) throw err
+    t.is(data[0], '8.8.8.8')
+    t.ok(data[1].geo)
+    t.ok(data[1].dns)
+    t.ok(data[1].asn)
+    t.ok(data[1].isp)
+    t.ok(data[1].connectionType)
+  })
 
-        assert.strictEqual(data[0], '8.8.8.8')
-        assert.ok(data[1].geo)
-        assert.ok(data[1].dns)
-        assert.ok(data[1].asn)
-        assert.ok(data[1].isp)
-        assert.ok(data[1].connectionType)
-
-        done()
-      } catch (err) {
-        done(err)
-      }
-    })
-  }).timeout(7000)
-
-  it('getIpInfoCached: second call gets all ip info endpoint (cached)', (done) => {
+  await t.test('getIpInfoCached: second call gets all ip info endpoint (cached)', async (t) => {
     const query = {
       action: 'getIpInfoCached',
       args: ['8.8.8.8']
     }
+    const data = await client.request(query)
 
-    client.request(query, (err, data) => {
-      try {
-        if (err) throw err
+    t.is(data[0], '8.8.8.8')
+    t.ok(data[1].geo)
+    t.ok(data[1].dns)
+    t.ok(data[1].asn)
+    t.ok(data[1].isp)
+    t.ok(data[1].connectionType)
+  })
 
-        assert.strictEqual(data[0], '8.8.8.8')
-        assert.ok(data[1].geo)
-        assert.ok(data[1].dns)
-        assert.ok(data[1].asn)
-        assert.ok(data[1].isp)
-        assert.ok(data[1].connectionType)
-
-        done()
-      } catch (err) {
-        done(err)
-      }
-    })
-  }).timeout(7000)
-
-  it('getIpAsn: retrieves asn info', (done) => {
+  await t.test('getIpAsn: retrieves asn info', async (t) => {
     const query = {
       action: 'getIpAsn',
       args: ['8.8.8.8']
     }
+    const data = await client.request(query)
 
-    client.request(query, (err, data) => {
-      try {
-        if (err) throw err
+    const [ip, asnData] = data
+    t.is(ip, '8.8.8.8')
+    t.ok(
+      /google/.test(asnData.autonomous_system_organization.toLowerCase()),
+      'owned by google'
+    )
+  })
 
-        const [ip, asnData] = data
-        assert.strictEqual(ip, '8.8.8.8')
-        assert.ok(
-          /google/.test(asnData.autonomous_system_organization.toLowerCase()),
-          'owned by google'
-        )
-
-        done()
-      } catch (err) {
-        done(err)
-      }
-    })
-  }).timeout(7000)
-
-  it('geo-isp: retrieves ips ISP', (done) => {
+  await t.test('geo-isp: retrieves ips ISP', async (t) => {
     const query = {
       action: 'getIpIsp',
       args: ['53.1.34.21']
     }
+    const data = await client.request(query)
 
-    client.request(query, (err, data) => {
-      try {
-        if (err) throw err
+    t.is(data[0], '53.1.34.21', 'result contains queried ip')
+    const res = data[1]
+    t.is(res.isp, 'Mercedes-Benz Group')
+  })
 
-        assert.strictEqual(
-          data[0], '53.1.34.21', 'result contains queried ip'
-        )
-
-        const res = data[1]
-        assert.strictEqual(res.isp, 'Mercedes-Benz Group')
-        done()
-      } catch (err) {
-        done(err)
-      }
-    })
-  }).timeout(7000)
-
-  it('getIpConnectionType: retrieves ips connection type', (done) => {
+  await t.test('getIpConnectionType: retrieves ips connection type', async (t) => {
     const query = {
       action: 'getIpConnectionType',
       args: ['53.1.34.21']
     }
+    const data = await client.request(query)
 
-    client.request(query, (err, data) => {
-      try {
-        if (err) throw err
+    t.is(data[0], '53.1.34.21', 'result contains queried ip')
+    const res = data[1]
+    t.is(res.connection_type, 'Cable/DSL')
+  })
 
-        assert.strictEqual(
-          data[0], '53.1.34.21', 'result contains queried ip'
-        )
-
-        const res = data[1]
-        assert.strictEqual(res.connection_type, 'Cable/DSL')
-        done()
-      } catch (err) {
-        done(err)
-      }
-    })
-  }).timeout(7000)
-
-  it('geo-ip: retrieves ips with accuracy_radius < 500km has confidence score > 0', (done) => {
+  await t.test('geo-ip: retrieves ips with accuracy_radius < 500km has confidence score > 0', async (t) => {
     const query = {
       action: 'getIpGeo',
       args: ['2.125.160.216']
     }
+    const data = await client.request(query)
 
-    client.request(query, (err, data) => {
-      try {
-        if (err) throw err
+    t.is(data[0], '2.125.160.216', 'result contains queried ip')
+    const res = data[1]
+    t.ok(res.area < 500)
+    t.ok(res.confidenceScore > 0 && res.confidenceScore < 1)
+    t.is(res.country, 'GB')
+  })
 
-        assert.strictEqual(
-          data[0], '2.125.160.216', 'result contains queried ip'
-        )
-
-        const res = data[1]
-        assert.ok(res.area < 500)
-        assert.ok(res.confidenceScore > 0 && res.confidenceScore < 1)
-        assert.strictEqual(res.country, 'GB')
-        done()
-      } catch (err) {
-        done(err)
-      }
-    })
-  }).timeout(7000)
-
-  it('geo-ip: retrieves ips with accuracy_radius > 500km has confidence score=0', (done) => {
-    const query2 = {
+  await t.test('geo-ip: retrieves ips with accuracy_radius > 500km has confidence score=0', async (t) => {
+    const query = {
       action: 'getIpGeo',
       args: ['8.8.8.8']
     }
+    const data = await client.request(query)
 
-    client.request(query2, (err, data) => {
-      try {
-        if (err) throw err
-
-        assert.strictEqual(
-          data[0], '8.8.8.8', 'result contains queried ip'
-        )
-
-        const res = data[1]
-        assert.ok(res.area > 500)
-        assert.strictEqual(res.confidenceScore, 0)
-        assert.strictEqual(res.country, 'US')
-        done()
-      } catch (err) {
-        done(err)
-      }
-    })
-  }).timeout(7000)
-})
+    t.is(data[0], '8.8.8.8', 'result contains queried ip')
+    const res = data[1]
+    t.ok(res.area > 500)
+    t.is(res.confidenceScore, 0)
+    t.is(res.country, 'US')
+  })
+}))
